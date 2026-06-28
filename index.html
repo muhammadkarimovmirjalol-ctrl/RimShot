@@ -192,7 +192,6 @@
         </header>
 
         <main id="game-container">
-            <!-- 1-QADAM: DYNAMIC ENTRY SPLASH LOBBY OVERLAY -->
             <div class="screen-overlay" id="setup-overlay" style="display: flex;">
                 <h1 class="menu-title">RIMSHOT 1v1</h1>
                 <p style="font-size: 11px; color: #94a3b8; margin-bottom: 10px; letter-spacing: 2px;">Real Human Athlete Basketball Duel</p>
@@ -242,8 +241,7 @@
                 </div>
             </div>
 
-            <!-- 2-QADAM: ENRICHED MODALS ACROSS ALL TABS -->
-            <!-- GAME MODES MODAL -->
+            <!-- ENRICHED MODALS ACROSS ALL TABS -->
             <div class="screen-overlay hidden" id="modal-modes">
                 <div class="modal-card">
                     <div class="modal-header"><div class="modal-title">🎮 SELECT GAME MODE</div><button class="btn-close-modal" onclick="closeModal('modal-modes')">✕</button></div>
@@ -254,14 +252,10 @@
                         <div style="background:rgba(255,255,255,0.04); padding:14px; border-radius:14px; border:1px solid var(--glass-border); text-align:center;">
                             <div style="font-size:36px;">🏆</div><div style="font-weight:900; font-size:16px; color:#fff;">Turnir Kubogi</div><p style="font-size:11px; color:#94a3b8; margin:4px 0 10px;">4-Stage Championship Cup</p><button class="btn-action-sm" onclick="closeModal('modal-modes'); openModal('modal-tournament');">ENTER TURNIR</button>
                         </div>
-                        <div style="background:rgba(255,255,255,0.04); padding:14px; border-radius:14px; border:1px solid var(--glass-border); text-align:center;">
-                            <div style="font-size:36px;">⏱️</div><div style="font-weight:900; font-size:16px; color:#fff;">Time Attack</div><p style="font-size:11px; color:#94a3b8; margin:4px 0 10px;">Score as many points in 60s</p><button class="btn-action-sm" onclick="alert('Time Attack coming soon!')">COMING SOON</button>
-                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TURNIR KUBOGI MODAL -->
             <div class="screen-overlay hidden" id="modal-tournament">
                 <div class="modal-card" style="width: 650px; text-align: center;">
                     <div class="modal-header"><div class="modal-title">🏆 GRAND TURNIR KUBOGI</div><button class="btn-close-modal" onclick="closeModal('modal-tournament')">✕</button></div>
@@ -278,12 +272,10 @@
                             <div style="font-size: 10px; color: #94a3b8;">GRAND FINAL</div><div style="font-weight: 900; color: #94a3b8;">LOCKED 🔒</div>
                         </div>
                     </div>
-                    <div style="font-size: 12px; color: var(--gold-accent); font-weight: bold; margin-bottom: 12px;">Grand Prize: 5,000 Coins 🪙 & Gold Championship Medal 🥇</div>
                     <button class="btn-start-gold" onclick="closeModal('modal-tournament'); startGame();">Play Semifinal Match</button>
                 </div>
             </div>
 
-            <!-- ENRICHED SHOP MODAL (BALLS, SNEAKERS, JERSEYS) -->
             <div class="screen-overlay hidden" id="modal-shop">
                 <div class="modal-card">
                     <div class="modal-header"><div class="modal-title">🛒 RIMSHOT EQUIPMENT SHOP</div><button class="btn-close-modal" onclick="closeModal('modal-shop')">✕</button></div>
@@ -302,34 +294,12 @@
                             <div class="shop-item-icon">💎</div><div class="shop-item-name">Diamond Cyber</div><div class="shop-item-price">5,000 🪙</div><button class="btn-action-sm" onclick="alert('Equipped Diamond Cyber Ball!')">EQUIP</button>
                         </div>
                     </div>
-
-                    <div style="font-size: 12px; font-weight: 800; color: var(--blue-glow); text-align: left; margin-top: 10px;">👟 Sneakers & Shoes</div>
-                    <div class="shop-grid">
-                        <div class="shop-item-card">
-                            <div class="shop-item-icon">👟</div><div class="shop-item-name">Air Jordan Pro</div><div class="shop-item-price">2,000 🪙</div><button class="btn-action-sm" onclick="alert('Equipped Air Jordan Pro!')">EQUIP</button>
-                        </div>
-                        <div class="shop-item-card">
-                            <div class="shop-item-icon">⚡</div><div class="shop-item-name">Cyber Speed Boots</div><div class="shop-item-price">3,500 🪙</div><button class="btn-action-sm" onclick="alert('Equipped Cyber Speed Boots!')">EQUIP</button>
-                        </div>
-                    </div>
-
-                    <div style="font-size: 12px; font-weight: 800; color: var(--red-glow); text-align: left; margin-top: 10px;">🎽 Jerseys & Uniforms</div>
-                    <div class="shop-grid">
-                        <div class="shop-item-card">
-                            <div class="shop-item-icon">🎽</div><div class="shop-item-name">Gold Lakers #23</div><div class="shop-item-price">DEFAULT</div><button class="btn-action-sm equipped">EQUIPPED</button>
-                        </div>
-                        <div class="shop-item-card">
-                            <div class="shop-item-icon">👕</div><div class="shop-item-name">Red Bulls #99</div><div class="shop-item-price">2,500 🪙</div><button class="btn-action-sm" onclick="alert('Equipped Red Bulls Jersey!')">EQUIP</button>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <!-- ENRICHED DAILY REWARDS 7-DAY STREAK -->
             <div class="screen-overlay hidden" id="modal-daily">
                 <div class="modal-card setup-form" style="width: 550px;">
                     <div class="modal-header" style="border:none; padding:0;"><div class="modal-title">🎁 7-DAY DAILY REWARDS STREAK</div><button class="btn-close-modal" onclick="closeModal('modal-daily')">✕</button></div>
-                    <p style="font-size: 11px; color: #94a3b8; text-align: center;">Har kuni kirib tekin sovg'alarni oling!</p>
                     <div class="streak-grid">
                         <div class="streak-card active"><div class="streak-day">DAY 1</div><div class="streak-reward">🪙</div><div style="font-size:9px; font-weight:bold;">500</div></div>
                         <div class="streak-card"><div class="streak-day">DAY 2</div><div class="streak-reward">🪙</div><div style="font-size:9px; font-weight:bold;">1,000</div></div>
@@ -343,17 +313,13 @@
                 </div>
             </div>
 
-            <!-- LUCKY BARABAN SPIN MODAL -->
             <div class="screen-overlay hidden" id="modal-spin">
                 <div class="modal-card" style="width: 480px; align-items: center;">
                     <div class="modal-header" style="width: 100%;"><div class="modal-title">🎰 LUCKY BARABAN SPIN</div><button class="btn-close-modal" onclick="closeModal('modal-spin')">✕</button></div>
-                    <div style="font-size:64px; margin:16px 0; animation: spin 4s infinite linear;">🎡</div>
-                    <div style="font-size:13px; font-weight:800; color:var(--gold-accent);">Spin & Win up to 10,000 Coins!</div>
-                    <button class="btn-start-gold" style="font-size: 13px; padding: 10px 28px; margin-top:14px;" onclick="alert('Spin Baraban! You Won 1,000 Coins 🪙')">SPIN BARABAN NOW</button>
+                    <button class="btn-start-gold" style="font-size: 13px; padding: 10px 28px; margin-top:14px;" onclick="alert('Spin Baraban!')">SPIN BARABAN NOW</button>
                 </div>
             </div>
 
-            <!-- PLAYER PROFILE MODAL -->
             <div class="screen-overlay hidden" id="modal-profile">
                 <div class="modal-card setup-form" style="width: 560px;">
                     <div class="modal-header" style="border:none; padding:0;"><div class="modal-title">👤 PLAYER PROFILE & ANKETA</div><button class="btn-close-modal" onclick="closeModal('modal-profile')">✕</button></div>
@@ -369,12 +335,6 @@
                             <div><label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Ism</label><input id="prof-firstname" type="text" value="Ali" /></div>
                             <div><label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Familya</label><input id="prof-lastname" type="text" value="Valiyev" /></div>
                         </div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                            <div><label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Yosh</label><input id="prof-age" type="number" value="18" /></div>
-                            <div><label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Tug'ilgan Yil</label><input id="prof-year" type="number" value="2008" /></div>
-                        </div>
-                        <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Player Bio / Haqingizda</label>
-                        <textarea id="prof-bio" rows="2" placeholder="O'zingiz haqingizda qisqacha yozing..."></textarea>
                         <button class="btn-start-gold" style="width: 100%; font-size: 13px; padding: 8px 0; margin-top: 4px;" onclick="saveDetailedProfile()">Save Profile Anketa</button>
                     </div>
                 </div>
@@ -816,12 +776,32 @@
 
         function triggerTextPopup(x, y, text, color) { textPopups.push({ x, y, text, color, life: 50 }); }
 
-        window.addEventListener('keydown', e => { const k = e.key.toLowerCase(); keysPressed[k] = true; handleKeyPress(k); });
-        window.addEventListener('keyup', e => { const k = e.key.toLowerCase(); keysPressed[k] = false; handleKeyRelease(k); });
+        /* PREVENT BROWSERS FROM SCROLLING PAGE WHEN PRESSING GAME CONTROLS */
+        window.addEventListener('keydown', e => {
+            const k = e.key.toLowerCase();
+            if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' ', 'space'].includes(k)) {
+                if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                }
+            }
+            keysPressed[k] = true;
+            handleKeyPress(k);
+        });
+
+        window.addEventListener('keyup', e => {
+            const k = e.key.toLowerCase();
+            if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' ', 'space'].includes(k)) {
+                if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                }
+            }
+            keysPressed[k] = false;
+            handleKeyRelease(k);
+        });
 
         function handleKeyPress(key) {
             if (!isGameStarted || isPaused) return;
-            if ((key === 'arrowup' || key === 'w') && pUser.onGround) { pUser.vy = -13.0; pUser.onGround = false; synth.playBounce(); }
+            if ((key === 'arrowup' || key === 'w' || key === ' ') && pUser.onGround) { pUser.vy = -13.0; pUser.onGround = false; synth.playBounce(); }
             if (isTipOffPhase) return;
             if (key === 'k') {
                 if (ball.carrier === pBot && Math.hypot(pUser.x - pBot.x, pUser.y - pBot.y) < 85) {
