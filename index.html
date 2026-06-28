@@ -250,7 +250,7 @@
                             <div style="font-size:36px;">🤖</div><div style="font-weight:900; font-size:16px; color:var(--gold-accent);">1v1 Duel Match</div><p style="font-size:11px; color:#94a3b8; margin:4px 0 10px;">Classic 3-minute duel vs Bot AI</p><button class="btn-action-sm" onclick="closeModal('modal-modes'); startGame();">PLAY DUEL</button>
                         </div>
                         <div style="background:rgba(255,255,255,0.04); padding:14px; border-radius:14px; border:1px solid var(--glass-border); text-align:center;">
-                            <div style="font-size:36px;">🏆</div><div style="font-weight:900; font-size:16px; color:#fff;">Turnir Kubogi</div><p style="font-size:11px; color:#94a3b8; margin:4px 0 10px;">4-Stage Championship Cup</p><button class="btn-action-sm" onclick="closeModal('modal-modes'); openModal('modal-tournament');">ENTER TURNIR</button>
+                            <div style="font-size:36px;">🏆</div><div style="font-weight:900; font-size:16px; color:#fff;">Turnir Kubogi</div><p style="font-size:11px; color:#94a3b8; margin:4px 0 10px;">4-Stage Championship Cup</p><button class="btn-action-sm" onclick="closeModal('modal-modes'); openModal('modal-tournament', 'tab-tournament');">ENTER TURNIR</button>
                         </div>
                     </div>
                 </div>
@@ -384,23 +384,24 @@
         </footer>
     </div>
 
+    <!-- DYNAMIC ACTIVE TAB HIGHLIGHTING BOTTOM NAV BAR -->
     <div class="bottom-nav-bar">
-        <div class="bottom-tab active" onclick="returnToMainMenu()"><span>🏠</span>Home</div>
-        <div class="bottom-tab" onclick="openModal('modal-modes')"><span>🎮</span>Modes</div>
-        <div class="bottom-tab" onclick="openModal('modal-tournament')"><span>🏆</span>Turnir</div>
-        <div class="bottom-tab" onclick="openModal('modal-shop')"><span>🛒</span>Shop</div>
-        <div class="bottom-tab" onclick="openModal('modal-daily')"><span>🎁</span>Rewards</div>
-        <div class="bottom-tab" onclick="openModal('modal-spin')"><span>🎰</span>Spin</div>
-        <div class="bottom-tab" onclick="openModal('modal-profile')"><span>👤</span>Profile</div>
+        <div class="bottom-tab active" id="tab-home" onclick="returnToMainMenu()"><span>🏠</span>Home</div>
+        <div class="bottom-tab" id="tab-modes" onclick="openModal('modal-modes', 'tab-modes')"><span>🎮</span>Modes</div>
+        <div class="bottom-tab" id="tab-tournament" onclick="openModal('modal-tournament', 'tab-tournament')"><span>🏆</span>Turnir</div>
+        <div class="bottom-tab" id="tab-shop" onclick="openModal('modal-shop', 'tab-shop')"><span>🛒</span>Shop</div>
+        <div class="bottom-tab" id="tab-daily" onclick="openModal('modal-daily', 'tab-daily')"><span>🎁</span>Rewards</div>
+        <div class="bottom-tab" id="tab-spin" onclick="openModal('modal-spin', 'tab-spin')"><span>🎰</span>Spin</div>
+        <div class="bottom-tab" id="tab-profile" onclick="openModal('modal-profile', 'tab-profile')"><span>👤</span>Profile</div>
     </div>
 
     <div class="drawer-overlay" id="drawer-overlay" onclick="if(event.target===this) toggleDrawer()">
         <div class="drawer-content">
             <div style="font-size: 20px; font-weight: 900; color: var(--gold-accent); margin-bottom: 12px;">RIMSHOT MENU</div>
             <div class="drawer-link" onclick="toggleDrawer(); returnToMainMenu();">🏠 Home</div>
-            <div class="drawer-link" onclick="toggleDrawer(); openModal('modal-modes');">🎮 Game Modes</div>
-            <div class="drawer-link" onclick="toggleDrawer(); openModal('modal-tournament');">🏆 Turnir Kubogi</div>
-            <div class="drawer-link" onclick="toggleDrawer(); openModal('modal-spin');">🎰 Lucky Spin</div>
+            <div class="drawer-link" onclick="toggleDrawer(); openModal('modal-modes', 'tab-modes');">🎮 Game Modes</div>
+            <div class="drawer-link" onclick="toggleDrawer(); openModal('modal-tournament', 'tab-tournament');">🏆 Turnir Kubogi</div>
+            <div class="drawer-link" onclick="toggleDrawer(); openModal('modal-spin', 'tab-spin');">🎰 Lucky Spin</div>
             <div class="drawer-link" onclick="toggleDrawer(); openModal('modal-settings');">⚙️ Settings (Nastroyka)</div>
         </div>
     </div>
@@ -523,10 +524,40 @@
         }
         function resumeMatch() { isPaused = false; const p = document.getElementById('pause-overlay'); p.style.display = 'none'; p.classList.add('hidden'); synth.startAcousticGuitarBGM(); }
         function restartMatchDirect() { resumeMatch(); startGame(); }
-        function closeAllModals() { document.querySelectorAll('.screen-overlay:not(#setup-overlay)').forEach(m => { m.classList.add('hidden'); if(m.id==='pause-overlay') m.style.display='none'; }); }
-        function openModal(id) { closeAllModals(); document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function returnToMainMenu() { resumeMatch(); isGameStarted = false; synth.stopBGM(); closeAllModals(); document.getElementById('setup-overlay').style.display = 'flex'; }
+        
+        function closeAllModals() {
+            document.querySelectorAll('.screen-overlay:not(#setup-overlay)').forEach(m => {
+                m.classList.add('hidden');
+                if(m.id==='pause-overlay') m.style.display='none';
+            });
+        }
+
+        function openModal(modalId, tabId) {
+            closeAllModals();
+            document.getElementById(modalId).classList.remove('hidden');
+            if (tabId) {
+                document.querySelectorAll('.bottom-tab').forEach(tab => tab.classList.remove('active'));
+                const activeTab = document.getElementById(tabId);
+                if (activeTab) activeTab.classList.add('active');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.querySelectorAll('.bottom-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById('tab-home').classList.add('active');
+        }
+
+        function returnToMainMenu() {
+            resumeMatch();
+            isGameStarted = false;
+            synth.stopBGM();
+            closeAllModals();
+            document.querySelectorAll('.bottom-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById('tab-home').classList.add('active');
+            document.getElementById('setup-overlay').style.display = 'flex';
+        }
+
         function toggleDrawer() { document.getElementById('drawer-overlay').classList.toggle('open'); }
 
         function saveNickname(val) {
@@ -776,7 +807,6 @@
 
         function triggerTextPopup(x, y, text, color) { textPopups.push({ x, y, text, color, life: 50 }); }
 
-        /* PREVENT BROWSERS FROM SCROLLING PAGE WHEN PRESSING GAME CONTROLS */
         window.addEventListener('keydown', e => {
             const k = e.key.toLowerCase();
             if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' ', 'space'].includes(k)) {
