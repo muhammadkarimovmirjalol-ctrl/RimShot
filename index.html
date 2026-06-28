@@ -841,7 +841,7 @@
         }
         function handleKeyRelease(key) {
             if (!isGameStarted || isPaused || isTipOffPhase) return;
-            if (key === 'k' && pUser.isCharging) { pUser.isCharging = false; performThrow(pUser, pUser.chargePower); pUser.chargePower = 0; }
+            if (key === 'k' && pUser.isCharging) { pUser.isCharging = false; performThrow(player, pUser.chargePower); pUser.chargePower = 0; }
         }
 
         function performThrow(player, power) {
@@ -888,7 +888,7 @@
                 ctx.fillStyle = grad; ctx.fillRect(0, 0, 1280, 530);
                 
                 ctx.save();
-                // Glowing outer aura around centered moon at 200, 80
+                // Glowing outer aura centered at 200, 80
                 let moonAura = ctx.createRadialGradient(200, 80, 5, 200, 80, 40);
                 moonAura.addColorStop(0, 'rgba(248, 250, 252, 0.85)');
                 moonAura.addColorStop(0.5, 'rgba(226, 232, 240, 0.35)');
@@ -898,8 +898,8 @@
                 // Centered white moon sphere at 200, 80
                 ctx.fillStyle = '#f8fafc'; ctx.beginPath(); ctx.arc(200, 80, 18, 0, Math.PI * 2); ctx.fill();
 
-                // Softened translucent shadow shifted slightly left (192, 80) so crescent faces RIGHT
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.78)'; ctx.beginPath(); ctx.arc(192, 80, 16, 0, Math.PI * 2); ctx.fill();
+                // Softened translucent shadow shifted slightly RIGHT (208, 80) so white crescent curves towards the RIGHT (🌙)
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.82)'; ctx.beginPath(); ctx.arc(208, 80, 16, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
 
                 ctx.save(); ctx.fillStyle = 'rgba(255, 255, 255, 0.075)';
