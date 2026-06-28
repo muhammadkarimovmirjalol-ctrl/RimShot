@@ -710,7 +710,7 @@
                     if (botShotCooldown > 0) botShotCooldown--;
                     if (botShotCooldown <= 0) {
                         performThrow(this, 85);
-                        botShotCooldown = 80;
+                        botShotCooldown = 90;
                     } else {
                         if (this.x < 450) this.vx = speedLimit;
                         else if (this.x > 650) this.vx = -speedLimit;
@@ -781,12 +781,14 @@
                 if (this.y + this.radius >= 530) { this.y = 530 - this.radius; this.vy = -this.vy * 0.76; if (Math.abs(this.vy)>1.5) synth.playBounce(); }
                 if (this.x <= 20 || this.x >= 1260) this.vx = -this.vx * 0.7;
 
-                // FOOLPROOF NET ENTRY DETECTION:
-                // Triggers ONLY when ball moves DOWNWARDS (vy > 0), crossed rim level (243) from top, and is strictly within drawn rim width!
-                if (this.vy > 0.5 && !this.hasScored && this.prevY < 243 && this.y >= 243 && this.y <= 270) {
-                    if (this.x >= 235 && this.x <= 275) {
+                // BULLETPROOF DISTANCE-BASED NET COLLISION SCORING:
+                // Triggers 100% reliably when ball drops downwards (vy > 0) near Left Rim (250, 243) or Right Rim (1024, 243)!
+                if (this.vy > 0.1 && !this.hasScored) {
+                    const distLeft = Math.hypot(this.x - 250, this.y - 243);
+                    const distRight = Math.hypot(this.x - 1024, this.y - 243);
+                    if (distLeft < 38) {
                         processScore(true); // Left Hoop Rim -> Bot Score
-                    } else if (this.x >= 1002 && this.x <= 1046) {
+                    } else if (distRight < 38) {
                         processScore(false); // Right Hoop Rim -> User Score
                     }
                 }
@@ -883,7 +885,7 @@
 
         function processScore(isLeftHoop) {
             ball.hasScored = true;
-            ball.vx = 0; ball.vy = 3.0; // Drop straight down through net
+            ball.vx = 0; ball.vy = 4.0; // Drop straight down through net
             
             if (isLeftHoop) {
                 botScore += 2; spectatorsList.forEach(row => row.forEach((spec, idx) => { if(idx >= 12) spec.reactTimer = 85; }));
