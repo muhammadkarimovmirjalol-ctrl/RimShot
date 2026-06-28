@@ -781,13 +781,15 @@
                 if (this.y + this.radius >= 530) { this.y = 530 - this.radius; this.vy = -this.vy * 0.76; if (Math.abs(this.vy)>1.5) synth.playBounce(); }
                 if (this.x <= 20 || this.x >= 1260) this.vx = -this.vx * 0.7;
 
-                // EXACT HOOP NET CROSSING DETECTION:
-                // Triggers ONLY when ball center has fully crossed downwards through the hoop net coordinate!
-                if (this.vy > 0 && !this.hasScored && this.prevY <= 245 && this.y >= 245 && this.y <= 285) {
-                    if (this.x >= 232 && this.x <= 280) {
-                        processScore(true);  // Left Hoop Net crossed -> Bot scores!
-                    } else if (this.x >= 1000 && this.x <= 1048) {
-                        processScore(false); // Right Hoop Net crossed -> User scores!
+                // PERFECT CONTINUOUS SCORING DETECTION FOR BOTH USER AND BOT:
+                // Triggers 100% reliably whenever ball moves downward through Left Rim (250, 243) or Right Rim (1024, 243)
+                if (this.vy > 0 && !this.hasScored) {
+                    if (this.prevY <= 255 && this.y >= 235) {
+                        if (this.x >= 220 && this.x <= 285) {
+                            processScore(true);  // Left Hoop Net crossed -> Bot scores +2 continuously!
+                        } else if (this.x >= 995 && this.x <= 1060) {
+                            processScore(false); // Right Hoop Net crossed -> User scores +2 continuously!
+                        }
                     }
                 }
             }
@@ -840,7 +842,7 @@
                 }
             }
             keysPressed[k] = false;
-            handleKeyRelease(k);
+            handleKeyRelease(key);
         });
 
         function handleKeyPress(key) {
