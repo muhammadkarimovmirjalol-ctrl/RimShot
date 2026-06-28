@@ -781,8 +781,8 @@
                 if (this.y + this.radius >= 530) { this.y = 530 - this.radius; this.vy = -this.vy * 0.76; if (Math.abs(this.vy)>1.5) synth.playBounce(); }
                 if (this.x <= 20 || this.x >= 1260) this.vx = -this.vx * 0.7;
 
-                // BULLETPROOF DISTANCE-BASED NET COLLISION SCORING:
-                // Triggers 100% reliably when ball drops downwards (vy > 0) near Left Rim (250, 243) or Right Rim (1024, 243)!
+                // STRICT NET COLLISION SCORING:
+                // Triggers ONLY when ball moves downwards (vy > 0) through Left Rim (250, 243) or Right Rim (1024, 243)!
                 if (this.vy > 0.1 && !this.hasScored) {
                     const distLeft = Math.hypot(this.x - 250, this.y - 243);
                     const distRight = Math.hypot(this.x - 1024, this.y - 243);
@@ -880,7 +880,7 @@
             ball.vy = (targetY - ball.y - 0.5 * g * timeToTarget * timeToTarget) / timeToTarget;
             
             synth.playSwish();
-            triggerTextPopup(player.x, player.y - 50, 'SHOOT! 🏀', player.isUser ? '#f59e0b' : '#ffffff');
+            // Strictly NO premature text or scoring triggers here!
         }
 
         function processScore(isLeftHoop) {
