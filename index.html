@@ -932,14 +932,14 @@
                 if (this.y + this.radius >= 530) { this.y = 530 - this.radius; this.vy = -this.vy * 0.76; if (Math.abs(this.vy)>1.5) synth.playBounce(); }
                 if (this.x <= 20 || this.x >= 1260) this.vx = -this.vx * 0.7;
 
-                // PERFECT CONTINUOUS SCORING DETECTION FOR BOTH USER AND BOT:
+                // 100% BULLETPROOF DISTANCE-BASED NET ENTRY & SCORING FOR USER AND BOT
                 if (this.vy > 0 && !this.hasScored) {
-                    if (this.prevY <= 255 && this.y >= 235) {
-                        if (this.x >= 220 && this.x <= 285) {
-                            processScore(true);  // Left Hoop Net crossed -> Bot scores +2 continuously!
-                        } else if (this.x >= 995 && this.x <= 1060) {
-                            processScore(false); // Right Hoop Net crossed -> User scores +2 continuously!
-                        }
+                    const distLeft = Math.hypot(this.x - 256, this.y - 243);
+                    const distRight = Math.hypot(this.x - 1024, this.y - 243);
+                    if (distLeft < 48) {
+                        processScore(true);  // Left Hoop Net crossed -> Bot scores +2 continuously!
+                    } else if (distRight < 48) {
+                        processScore(false); // Right Hoop Net crossed -> User scores +2 continuously!
                     }
                 }
             }
@@ -1033,13 +1033,13 @@
             ball.hasScored = false;
             ball.immunityTimer = 35; // 35 frames of possession immunity so ball can fly freely!
 
-            const targetX = player.isUser ? 1024 : 250;
+            const targetX = player.isUser ? 1024 : 256;
             const targetY = 243;
             if (player.onGround) {
                 player.vy = -11.0; player.onGround = false;
             }
             
-            const timeToTarget = 40;
+            const timeToTarget = 38;
             ball.vx = (targetX - ball.x) / timeToTarget;
             const g = 0.44;
             ball.vy = (targetY - ball.y - 0.5 * g * timeToTarget * timeToTarget) / timeToTarget;
