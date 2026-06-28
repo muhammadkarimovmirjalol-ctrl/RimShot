@@ -947,8 +947,8 @@
 
                 // 100% BULLETPROOF DISTANCE-BASED NET ENTRY & SCORING FOR USER AND BOT
                 if (this.vy > 0 && !this.hasScored) {
-                    const distLeft = Math.hypot(this.x - 256, this.y - 243);
-                    const distRight = Math.hypot(this.x - 1024, this.y - 243);
+                    const distLeft = Math.hypot(this.x - 146, this.y - 243);
+                    const distRight = Math.hypot(this.x - 1134, this.y - 243);
                     if (distLeft < 48) {
                         processScore(true);  // Left Hoop Net crossed -> Bot scores +2 continuously!
                     } else if (distRight < 48) {
@@ -991,8 +991,8 @@
             }
         }
 
-        let leftNetNodes = createNetNodes(230);
-        let rightNetNodes = createNetNodes(998);
+        let leftNetNodes = createNetNodes(120);
+        let rightNetNodes = createNetNodes(1108);
         let spectatorsList = createSpectators();
         let coach = new Coach();
         let ball = new Basketball();
@@ -1052,7 +1052,7 @@
             ball.hasScored = false;
             ball.immunityTimer = 35; // 35 frames of possession immunity so ball can fly freely!
 
-            const targetX = player.isUser ? 1024 : 256;
+            const targetX = player.isUser ? 1134 : 146;
             const targetY = 243;
             if (player.onGround) {
                 player.vy = -11.0; player.onGround = false;
@@ -1096,11 +1096,11 @@
             if (isLeftHoop) {
                 botScore += 2; spectatorsList.forEach(row => row.forEach((spec, idx) => { if(idx >= 12) spec.reactTimer = 85; }));
                 document.getElementById('score-bot').innerText = String(botScore).padStart(2,'0');
-                triggerTextPopup(256, 210, 'SHOOT! 🏀', '#ffffff');
+                triggerTextPopup(146, 210, 'SHOOT! 🏀', '#ffffff');
             } else {
                 userScore += 2; spectatorsList.forEach(row => row.forEach((spec, idx) => { if(idx < 12) spec.reactTimer = 85; }));
                 document.getElementById('score-user').innerText = String(userScore).padStart(2,'0');
-                triggerTextPopup(1024, 210, 'SHOOT! 🏀', '#f59e0b');
+                triggerTextPopup(1134, 210, 'SHOOT! 🏀', '#f59e0b');
             }
             synth.playSwish();
             
@@ -1118,20 +1118,20 @@
             }, 1200);
         }
 
-        // RULE 2: ANTIGRAVITY DRIBBLE LOGIC (REPLACING BALL HOLDING)
+        // TASK 2: CONSTANT TEMPO ANTIGRAVITY DRIBBLE LOGIC
         function handlePossession() {
             if (isTipOffPhase || isRoundResetting) return;
             if (ball.isCarried && ball.carrier) {
                 ball.x = ball.carrier.x + ball.carrier.facing * 20;
                 
-                // Physics-based vertical dribble bounce loop between floor and hand level
-                const speedScale = 0.18 + Math.min(0.2, Math.abs(ball.carrier.vx) * 0.05);
+                // CONSTANT, SMOOTH DRIBBLE RHYTHM INDEPENDENT OF PLAYER MOVEMENT/SPEED (vx/vy)
+                const speedScale = 0.18; 
                 const bouncePhase = Math.abs(Math.sin(systemTime * speedScale));
                 const handY = ball.carrier.y - 45;
                 const floorY = 514; // Floor bounce level
                 
                 ball.y = handY + bouncePhase * (floorY - handY);
-                ball.rotation += ball.carrier.facing * 0.12;
+                ball.rotation += ball.carrier.facing * 0.1;
                 return;
             }
             if (ball.immunityTimer > 0) return; // Prevent instant recapture right after throw!
@@ -1255,22 +1255,35 @@
         }
 
         function drawNet(nodes, isLeft) {
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)'; ctx.lineWidth = 1.8; const netStartX = isLeft ? 230 : 998;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)'; ctx.lineWidth = 1.8; const netStartX = isLeft ? 120 : 1108;
             for (let c = 0; c < 5; c++) {
                 ctx.beginPath(); ctx.moveTo(netStartX + c * 10, 245); ctx.lineTo(nodes[c][0].x, nodes[c][0].y); ctx.stroke();
                 for (let r = 0; r < 2; r++) { ctx.beginPath(); ctx.moveTo(nodes[c][r].x, nodes[c][r].y); ctx.lineTo(nodes[c][r+1].x, nodes[c][r+1].y); ctx.stroke(); }
             }
         }
 
+        // TASK 3: BACKBOARD POSITIONING & FRONT RECTANGLE LAYER RENDERING
         function drawHoops() {
-            ctx.fillStyle = '#334155'; ctx.fillRect(214, 210, 14, 320);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.88)'; ctx.fillRect(218, 155, 12, 110); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.strokeRect(218, 155, 12, 110);
-            ctx.fillStyle = '#FF5500'; ctx.fillRect(230, 243, 52, 6);
+            // LEFT HOOP (Shifted back near out line)
+            ctx.fillStyle = '#334155'; ctx.fillRect(104, 210, 14, 320); // Pole
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.88)'; ctx.fillRect(108, 155, 12, 110); // Backboard fill
+            ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.strokeRect(108, 155, 12, 110); // Backboard outer border
+            
+            // Inner target rectangle outline rendered ON TOP in front visually
+            ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.5; ctx.strokeRect(120, 200, 28, 32);
+            
+            ctx.fillStyle = '#FF5500'; ctx.fillRect(120, 243, 52, 6); // Rim
             if (leftNetNodes) drawNet(leftNetNodes, true);
 
-            ctx.fillStyle = '#334155'; ctx.fillRect(1054, 210, 14, 320);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.88)'; ctx.fillRect(1050, 155, 12, 110); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.strokeRect(1050, 155, 12, 110);
-            ctx.fillStyle = '#FF5500'; ctx.fillRect(998, 243, 52, 6);
+            // RIGHT HOOP (Shifted back near out line)
+            ctx.fillStyle = '#334155'; ctx.fillRect(1162, 210, 14, 320); // Pole
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.88)'; ctx.fillRect(1160, 155, 12, 110); // Backboard fill
+            ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.strokeRect(1160, 155, 12, 110); // Backboard outer border
+            
+            // Inner target rectangle outline rendered ON TOP in front visually
+            ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.5; ctx.strokeRect(1132, 200, 28, 32);
+            
+            ctx.fillStyle = '#FF5500'; ctx.fillRect(1108, 243, 52, 6); // Rim
             if (rightNetNodes) drawNet(rightNetNodes, false);
         }
 
@@ -1399,7 +1412,7 @@
 
         function restartGame() { closeModal('gameover-screen'); document.getElementById('setup-overlay').style.display = 'flex'; }
 
-        // ANIMATED DRIBBLE LOADING SCREEN LOGIC
+        // TASK 1: SLOWER & CALMER ANIMATED DRIBBLE LOADING SCREEN LOGIC
         function startLoadingScreenAnimation() {
             const overlay = document.getElementById('loading-overlay');
             const ball = document.getElementById('loading-ball');
@@ -1409,7 +1422,7 @@
             
             let progress = 1;
             const interval = setInterval(() => {
-                progress += 1.6;
+                progress += 0.45; // Slower, steady percentage progression
                 if (progress >= 100) {
                     progress = 100;
                     clearInterval(interval);
@@ -1427,11 +1440,11 @@
                     fill.style.width = progress + '%';
                     text.innerText = `LOADING ${Math.floor(progress)}%`;
                     
-                    // Dribble animation math
+                    // Dribble animation math synchronized with slower speed
                     const leftPx = (progress / 100) * 285;
-                    const bounceY = -Math.abs(Math.sin(progress * 0.28)) * 42;
+                    const bounceY = -Math.abs(Math.sin(progress * 0.15)) * 38;
                     ball.style.left = leftPx + 'px';
-                    ball.style.transform = `translateY(${bounceY}px) rotate(${progress * 12}deg)`;
+                    ball.style.transform = `translateY(${bounceY}px) rotate(${progress * 10}deg)`;
                 }
             }, 30);
         }
