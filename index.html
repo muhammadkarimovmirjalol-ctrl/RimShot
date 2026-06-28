@@ -705,12 +705,11 @@
             updateBotAI() {
                 let speedLimit = botDifficulty === 'easy' ? 3.0 : (botDifficulty === 'hard' ? 6.5 : 4.8);
                 if (ball.carrier === this) {
-                    const distToHoop = this.x - 230;
+                    const distToHoop = Math.abs(this.x - 230);
                     if (distToHoop > 130) { this.vx = -speedLimit; this.facing = -1; }
                     else {
                         if (this.onGround) {
-                            if (!this.isCharging) { this.isCharging = true; this.chargePower = 0; this.chargeDirection = 1; }
-                            if (this.chargePower >= 65) { this.isCharging = false; performThrow(this, 90); this.chargePower = 0; }
+                            performThrow(this, 90);
                         }
                     }
                 } else if (ball.carrier === pUser) {
@@ -836,18 +835,25 @@
             if (key === 'k') {
                 if (ball.carrier === pBot && Math.hypot(pUser.x - pBot.x, pUser.y - pBot.y) < 85) {
                     ball.isCarried = true; ball.carrier = pUser; synth.playSteal(); triggerTextPopup(pUser.x, pUser.y - 40, 'EASY STEAL!', '#10b981');
-                } else if (ball.carrier === pUser && !pUser.isCharging) { pUser.isCharging = true; pUser.chargePower = 0; pUser.chargeDirection = 1; }
+                } else if (ball.carrier === pUser) {
+                    performThrow(pUser, 80);
+                }
             }
         }
+
         function handleKeyRelease(key) {
             if (!isGameStarted || isPaused || isTipOffPhase) return;
-            if (key === 'k' && pUser.isCharging) { pUser.isCharging = false; performThrow(player, pUser.chargePower); pUser.chargePower = 0; }
         }
 
         function performThrow(player, power) {
+            if (!ball.isCarried || ball.carrier !== player) return;
             ball.isCarried = false; ball.carrier = null;
             const targetX = player.isUser ? 1050 : 230;
-            ball.vx = (targetX - ball.x) / 38; ball.vy = -11.5; synth.playSteal();
+            const dx = targetX - ball.x;
+            ball.vx = dx / 34;
+            ball.vy = -12.5;
+            synth.playSwish();
+            triggerTextPopup(player.x, player.y - 50, 'SHOOT! 🏀', '#f59e0b');
         }
 
         function processScore(isLeftHoop) {
