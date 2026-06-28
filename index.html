@@ -781,15 +781,13 @@
                 if (this.y + this.radius >= 530) { this.y = 530 - this.radius; this.vy = -this.vy * 0.76; if (Math.abs(this.vy)>1.5) synth.playBounce(); }
                 if (this.x <= 20 || this.x >= 1260) this.vx = -this.vx * 0.7;
 
-                // STRICT NET COLLISION SCORING:
-                // Triggers ONLY when ball moves downwards (vy > 0) through Left Rim (250, 243) or Right Rim (1024, 243)!
-                if (this.vy > 0.1 && !this.hasScored) {
-                    const distLeft = Math.hypot(this.x - 250, this.y - 243);
-                    const distRight = Math.hypot(this.x - 1024, this.y - 243);
-                    if (distLeft < 38) {
-                        processScore(true); // Left Hoop Rim -> Bot Score
-                    } else if (distRight < 38) {
-                        processScore(false); // Right Hoop Rim -> User Score
+                // EXACT HOOP NET CROSSING DETECTION:
+                // Triggers ONLY when ball center has fully crossed downwards through the hoop net coordinate!
+                if (this.vy > 0 && !this.hasScored && this.prevY <= 245 && this.y >= 245 && this.y <= 285) {
+                    if (this.x >= 232 && this.x <= 280) {
+                        processScore(true);  // Left Hoop Net crossed -> Bot scores!
+                    } else if (this.x >= 1000 && this.x <= 1048) {
+                        processScore(false); // Right Hoop Net crossed -> User scores!
                     }
                 }
             }
@@ -889,12 +887,14 @@
             
             if (isLeftHoop) {
                 botScore += 2; spectatorsList.forEach(row => row.forEach((spec, idx) => { if(idx >= 12) spec.reactTimer = 85; }));
+                document.getElementById('score-bot').innerText = String(botScore).padStart(2,'0');
+                triggerTextPopup(256, 210, 'SHOOT! 🏀', '#ffffff');
             } else {
                 userScore += 2; spectatorsList.forEach(row => row.forEach((spec, idx) => { if(idx < 12) spec.reactTimer = 85; }));
+                document.getElementById('score-user').innerText = String(userScore).padStart(2,'0');
+                triggerTextPopup(1024, 210, 'SHOOT! 🏀', '#f59e0b');
             }
-            document.getElementById('score-user').innerText = String(userScore).padStart(2,'0');
-            document.getElementById('score-bot').innerText = String(botScore).padStart(2,'0');
-            synth.playSwish(); triggerTextPopup(isLeftHoop ? 250 : 1024, 210, '+2 GOAL!', '#fbbf24');
+            synth.playSwish();
             
             setTimeout(() => {
                 ball.x = 640; ball.y = 200; ball.vx = 0; ball.vy = 0; ball.hasScored = false;
