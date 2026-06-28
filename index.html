@@ -167,7 +167,7 @@
 </head>
 <body>
 
-    <!-- TASK 1: PROFESSIONAL ANIMATED LOADING SCREEN -->
+    <!-- ANIMATED DRIBBLE LOADING SCREEN -->
     <div class="screen-overlay" id="loading-overlay" style="display: flex; z-index: 500; background: #070a12; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.6s ease; pointer-events: auto;">
         <div style="font-size: 34px; font-weight: 900; letter-spacing: 3px; background: linear-gradient(135deg, #fbbf24, #f87171, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 25px;">RIMSHOT 1v1</div>
         
@@ -295,7 +295,7 @@
                 </div>
             </div>
 
-            <!-- TASK 2: ENRICHED EQUIPMENT & CUSTOMIZATION SHOP -->
+            <!-- EQUIPMENT & CUSTOMIZATION SHOP -->
             <div class="screen-overlay hidden" id="modal-shop">
                 <div class="modal-card">
                     <div class="modal-header">
@@ -427,7 +427,7 @@
     </div>
 
     <script>
-        // TASK 2: FULL SHOP CATALOG & STATE MANAGEMENT
+        // FULL SHOP CATALOG & STATE MANAGEMENT
         const SHOP_CATALOG = [
             // BASKETBALL SKINS
             { category: 'ball', id: 'ball_default', name: 'Classic Orange', icon: '🏀', price: 0 },
@@ -617,6 +617,7 @@
         let userScore = 0, botScore = 0, matchTimer = 180, timerEvent = null, systemTime = 0;
         let textPopups = [], userPhotoDataURL = null;
         let isTipOffPhase = false, tipOffTimer = 0;
+        let isRoundResetting = false;
         let botShotCooldown = 0;
         const keysPressed = {};
 
@@ -785,10 +786,10 @@
 
         class Coach {
             constructor() { this.x = 640; this.y = 530; this.targetX = 640; }
-            update() { this.x += (this.targetX - this.x) * 0.05; }
+            update() { this.x += (this.targetX - this.x) * 0.08; }
             draw() {
                 ctx.save();
-                ctx.globalAlpha = isTipOffPhase ? 1.0 : 0.68;
+                ctx.globalAlpha = (isTipOffPhase || isRoundResetting) ? 1.0 : 0.68;
                 
                 ctx.save(); ctx.translate(this.x, 530); ctx.scale(1, 0.3);
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.35)'; ctx.beginPath(); ctx.arc(0, 0, 26, 0, Math.PI * 2); ctx.fill();
@@ -829,6 +830,7 @@
                 this.onGround = true; this.isCharging = false; this.chargePower = 0; this.chargeDirection = 1;
             }
             update() {
+                if (isRoundResetting) return;
                 if (!this.isUser) { if (!isTipOffPhase) this.updateBotAI(); return; }
 
                 const speed = 4.8;
@@ -930,7 +932,15 @@
                 this.x += this.vx; this.y += this.vy;
                 this.rotation += this.vx * 0.04;
                 if (this.y + this.radius >= 530) { this.y = 530 - this.radius; this.vy = -this.vy * 0.76; if (Math.abs(this.vy)>1.5) synth.playBounce(); }
-                if (this.x <= 20 || this.x >= 1260) this.vx = -this.vx * 0.7;
+                
+                // OUT OF BOUNDS & SHOT CLOCK RULES
+                if (this.x <= 20 || this.x >= 1260) {
+                    this.vx = -this.vx * 0.7;
+                    if (!this.hasScored && !isRoundResetting) {
+                        synth.playWhistle();
+                        triggerTextPopup(this.x, this.y, 'OUT OF BOUNDS! ⚠️', '#ef4444');
+                    }
+                }
 
                 // 100% BULLETPROOF DISTANCE-BASED NET ENTRY & SCORING FOR USER AND BOT
                 if (this.vy > 0 && !this.hasScored) {
@@ -1011,7 +1021,7 @@
         });
 
         function handleKeyPress(key) {
-            if (!isGameStarted || isPaused) return;
+            if (!isGameStarted || isPaused || isRoundResetting) return;
             if ((key === 'arrowup' || key === 'w' || key === ' ') && pUser.onGround) { pUser.vy = -13.0; pUser.onGround = false; synth.playBounce(); }
             if (isTipOffPhase) return;
             if (key === 'k') {
@@ -1045,12 +1055,16 @@
             ball.vy = (targetY - ball.y - 0.5 * g * timeToTarget * timeToTarget) / timeToTarget;
             
             synth.playSwish();
-            // Strictly NO premature text or scoring triggers here!
         }
 
+        // TASK 1: ROUND RESET LOGIC & POSSESSION PASS TO CONCEDING TEAM
         function processScore(isLeftHoop) {
             ball.hasScored = true;
             ball.vx = 0; ball.vy = 4.0; // Drop straight down through net
+            isRoundResetting = true;
+            
+            synth.playWhistle(); // Referee whistle sound
+            coach.targetX = 640; // Coach appears on court
             
             if (isLeftHoop) {
                 botScore += 2; spectatorsList.forEach(row => row.forEach((spec, idx) => { if(idx >= 12) spec.reactTimer = 85; }));
@@ -1063,13 +1077,33 @@
             }
             synth.playSwish();
             
+            // Post-goal restart sequence
             setTimeout(() => {
-                ball.x = 640; ball.y = 200; ball.vx = 0; ball.vy = 0; ball.hasScored = false;
-            }, 1000);
+                // Reset positions
+                pUser.x = 570; pUser.y = 530; pUser.vx = 0; pUser.vy = 0; pUser.onGround = true;
+                pBot.x = 710; pBot.y = 530; pBot.vx = 0; pBot.vy = 0; pBot.onGround = true;
+                coach.targetX = 100; // Coach returns to sideline
+                
+                // Conceding team gets ball possession (Real basketball rules)
+                ball.hasScored = false;
+                ball.isCarried = true;
+                if (isLeftHoop) {
+                    // Left hoop was Bot goal -> Bot scored -> Conceding team is USER!
+                    ball.carrier = pUser;
+                    triggerTextPopup(640, 200, 'USER POSSESSION 🏀', '#f59e0b');
+                } else {
+                    // Right hoop was User goal -> User scored -> Conceding team is BOT!
+                    ball.carrier = pBot;
+                    triggerTextPopup(640, 200, 'BOT POSSESSION 🏀', '#ffffff');
+                }
+                
+                synth.playWhistle();
+                isRoundResetting = false;
+            }, 1200);
         }
 
         function handlePossession() {
-            if (isTipOffPhase) return;
+            if (isTipOffPhase || isRoundResetting) return;
             if (ball.isCarried) { ball.x = ball.carrier.x + ball.carrier.facing*18; ball.y = ball.carrier.y - 45; return; }
             if (ball.immunityTimer > 0) return; // Prevent instant recapture right after throw!
             
@@ -1077,6 +1111,7 @@
             else if (Math.hypot(pBot.x - ball.x, pBot.y - ball.y) < 42) { ball.isCarried = true; ball.carrier = pBot; }
         }
 
+        // TASK 2: REAL BASKETBALL COURT MARKINGS & LINES
         function drawCourtGrid() {
             if (isDayTime) {
                 let grad = ctx.createLinearGradient(0, 0, 0, 530); grad.addColorStop(0, '#38bdf8'); grad.addColorStop(1, '#0284c7');
@@ -1117,6 +1152,23 @@
             
             ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 1;
             for (let i = 0; i < 1280; i += 40) { ctx.beginPath(); ctx.moveTo(i, 530); ctx.lineTo(i, 640); ctx.stroke(); }
+
+            // REAL BASKETBALL WHITE COURT MARKINGS
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)'; ctx.lineWidth = 2.5;
+            
+            // Center Court Circle & Half-court line
+            ctx.beginPath(); ctx.moveTo(640, 530); ctx.lineTo(640, 640); ctx.stroke();
+            ctx.beginPath(); ctx.arc(640, 585, 45, 0, Math.PI * 2); ctx.stroke();
+
+            // Left Key / Paint Area & 3-Point Arc
+            ctx.strokeRect(0, 550, 140, 70);
+            ctx.beginPath(); ctx.arc(0, 585, 260, -Math.PI * 0.3, Math.PI * 0.3); ctx.stroke();
+
+            // Right Key / Paint Area & 3-Point Arc
+            ctx.strokeRect(1140, 550, 140, 70);
+            ctx.beginPath(); ctx.arc(1280, 585, 260, Math.PI * 0.7, Math.PI * 1.3); ctx.stroke();
+            ctx.restore();
         }
 
         function drawSpectators() {
@@ -1232,7 +1284,7 @@
             synth.init(); synth.startAcousticGuitarBGM();
             isGameStarted = true; isPaused = false; userScore = 0; botScore = 0; matchTimer = 180;
             
-            isTipOffPhase = true; tipOffTimer = 0; coach.x = 640; coach.targetX = 640;
+            isTipOffPhase = true; isRoundResetting = false; tipOffTimer = 0; coach.x = 640; coach.targetX = 640;
             pUser.x = 570; pUser.y = 530; pBot.x = 710; pBot.y = 530;
             ball.x = 640; ball.y = 480; ball.vx = 0; ball.vy = 0; ball.isCarried = false; ball.hasScored = false; ball.immunityTimer = 0;
             
@@ -1319,7 +1371,7 @@
 
         function restartGame() { closeModal('gameover-screen'); document.getElementById('setup-overlay').style.display = 'flex'; }
 
-        // TASK 1 ANIMATED DRIBBLE LOADING SCREEN LOGIC
+        // ANIMATED DRIBBLE LOADING SCREEN LOGIC
         function startLoadingScreenAnimation() {
             const overlay = document.getElementById('loading-overlay');
             const ball = document.getElementById('loading-ball');
