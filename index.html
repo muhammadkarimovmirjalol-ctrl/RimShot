@@ -830,7 +830,11 @@
                 this.onGround = true; this.isCharging = false; this.chargePower = 0; this.chargeDirection = 1;
             }
             update() {
-                if (isRoundResetting) return;
+                if (isRoundResetting) {
+                    this.x += this.vx;
+                    this.vx *= 0.88;
+                    return;
+                }
                 if (!this.isUser) { if (!isTipOffPhase) this.updateBotAI(); return; }
 
                 const speed = 4.8;
@@ -844,7 +848,7 @@
                 if (!this.onGround) { this.vy += 0.52; this.y += this.vy; if (this.y >= 530) { this.y = 530; this.vy = 0; this.onGround = true; } }
                 if (this.x < 40) this.x = 40; if (this.x > 1240) this.x = 1240;
 
-                if (this.isCharging) {
+                if (this.isCharging && this.isUser) {
                     this.chargePower += 3.0 * this.chargeDirection;
                     if (this.chargePower >= 100 || this.chargePower <= 0) this.chargeDirection *= -1;
                 }
@@ -933,12 +937,11 @@
                 this.rotation += this.vx * 0.04;
                 if (this.y + this.radius >= 530) { this.y = 530 - this.radius; this.vy = -this.vy * 0.76; if (Math.abs(this.vy)>1.5) synth.playBounce(); }
                 
-                // OUT OF BOUNDS & SHOT CLOCK RULES
+                // RULE 3: CONSOLIDATED OUT OF BOUNDS / TURNOVER UI
                 if (this.x <= 20 || this.x >= 1260) {
                     this.vx = -this.vx * 0.7;
                     if (!this.hasScored && !isRoundResetting) {
-                        synth.playWhistle();
-                        triggerTextPopup(this.x, this.y, 'OUT OF BOUNDS! ⚠️', '#ef4444');
+                        DisplaySingleTurnoverMessage(this.x, this.y);
                     }
                 }
 
@@ -997,6 +1000,12 @@
         let pBot = new Player(710, '#ffffff', false);
 
         function triggerTextPopup(x, y, text, color) { textPopups.push({ x, y, text, color, life: 50 }); }
+
+        // RULE 3: CONSOLIDATED SINGLE TURNOVER MESSAGE DISPLAY
+        function DisplaySingleTurnoverMessage(x, y) {
+            synth.playWhistle();
+            triggerTextPopup(x || 640, y || 200, "OUT OF BOUNDS! TURNOVER! ⚠️", "#ef4444");
+        }
 
         window.addEventListener('keydown', e => {
             const k = e.key.toLowerCase();
@@ -1057,7 +1066,25 @@
             synth.playSwish();
         }
 
-        // TASK 1: ROUND RESET LOGIC & POSSESSION PASS TO CONCEDING TEAM
+        // RULE 1: UPDATED PLAYER RESTART AND ORIENTATION FUNCTION
+        function ResetRound(concedingIsUser) {
+            // Player 1 (Left Backboard): x = 250, facing right (+1)
+            pUser.x = 250; pUser.y = 530; pUser.vx = 0; pUser.vy = 0; pUser.onGround = true; pUser.facing = 1;
+            // Player 2 (Right Backboard): x = 1030, facing left (-1)
+            pBot.x = 1030; pBot.y = 530; pBot.vx = 0; pBot.vy = 0; pBot.onGround = true; pBot.facing = -1;
+
+            // Post-placement action: Controlled forward walk towards center line for restart
+            if (concedingIsUser) {
+                pUser.vx = 2.2; // Walk forward right towards center
+                ball.carrier = pUser;
+            } else {
+                pBot.vx = -2.2; // Walk forward left towards center
+                ball.carrier = pBot;
+            }
+            ball.hasScored = false;
+            ball.isCarried = true;
+        }
+
         function processScore(isLeftHoop) {
             ball.hasScored = true;
             ball.vx = 0; ball.vy = 4.0; // Drop straight down through net
@@ -1079,39 +1106,40 @@
             
             // Post-goal restart sequence
             setTimeout(() => {
-                // Reset positions
-                pUser.x = 570; pUser.y = 530; pUser.vx = 0; pUser.vy = 0; pUser.onGround = true;
-                pBot.x = 710; pBot.y = 530; pBot.vx = 0; pBot.vy = 0; pBot.onGround = true;
                 coach.targetX = 100; // Coach returns to sideline
                 
-                // Conceding team gets ball possession (Real basketball rules)
-                ball.hasScored = false;
-                ball.isCarried = true;
-                if (isLeftHoop) {
-                    // Left hoop was Bot goal -> Bot scored -> Conceding team is USER!
-                    ball.carrier = pUser;
-                    triggerTextPopup(640, 200, 'USER POSSESSION 🏀', '#f59e0b');
-                } else {
-                    // Right hoop was User goal -> User scored -> Conceding team is BOT!
-                    ball.carrier = pBot;
-                    triggerTextPopup(640, 200, 'BOT POSSESSION 🏀', '#ffffff');
-                }
+                // Conceding team gets ball possession with Rule 1 ResetRound orientation
+                const concedingIsUser = isLeftHoop; // If bot scored on left, conceding is user
+                ResetRound(concedingIsUser);
                 
+                triggerTextPopup(640, 200, concedingIsUser ? 'USER POSSESSION 🏀' : 'BOT POSSESSION 🏀', concedingIsUser ? '#f59e0b' : '#ffffff');
                 synth.playWhistle();
                 isRoundResetting = false;
             }, 1200);
         }
 
+        // RULE 2: ANTIGRAVITY DRIBBLE LOGIC (REPLACING BALL HOLDING)
         function handlePossession() {
             if (isTipOffPhase || isRoundResetting) return;
-            if (ball.isCarried) { ball.x = ball.carrier.x + ball.carrier.facing*18; ball.y = ball.carrier.y - 45; return; }
+            if (ball.isCarried && ball.carrier) {
+                ball.x = ball.carrier.x + ball.carrier.facing * 20;
+                
+                // Physics-based vertical dribble bounce loop between floor and hand level
+                const speedScale = 0.18 + Math.min(0.2, Math.abs(ball.carrier.vx) * 0.05);
+                const bouncePhase = Math.abs(Math.sin(systemTime * speedScale));
+                const handY = ball.carrier.y - 45;
+                const floorY = 514; // Floor bounce level
+                
+                ball.y = handY + bouncePhase * (floorY - handY);
+                ball.rotation += ball.carrier.facing * 0.12;
+                return;
+            }
             if (ball.immunityTimer > 0) return; // Prevent instant recapture right after throw!
             
             if (Math.hypot(pUser.x - ball.x, pUser.y - ball.y) < 42) { ball.isCarried = true; ball.carrier = pUser; }
             else if (Math.hypot(pBot.x - ball.x, pBot.y - ball.y) < 42) { ball.isCarried = true; ball.carrier = pBot; }
         }
 
-        // TASK 2: REAL BASKETBALL COURT MARKINGS & LINES
         function drawCourtGrid() {
             if (isDayTime) {
                 let grad = ctx.createLinearGradient(0, 0, 0, 530); grad.addColorStop(0, '#38bdf8'); grad.addColorStop(1, '#0284c7');
