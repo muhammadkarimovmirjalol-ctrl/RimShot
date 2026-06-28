@@ -128,13 +128,14 @@
         .btn-close-modal { background: rgba(255,255,255,0.1); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-weight: bold; }
 
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 6px; }
-        .shop-item-card { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 12px; padding: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 6px; transition: transform 0.2s ease; }
+        .shop-item-card { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 12px; padding: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-style: space-between; gap: 6px; transition: transform 0.2s ease; }
         .shop-item-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.08); }
         .shop-item-icon { font-size: 36px; margin: 4px 0; }
         .shop-item-name { font-size: 12px; font-weight: 800; color: #fff; }
         .shop-item-price { font-size: 11px; font-weight: 800; color: var(--gold-accent); }
         .btn-action-sm { background: rgba(37, 99, 235, 0.3); border: 1px solid var(--blue-glow); color: #fff; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 12px; cursor: pointer; width: 100%; text-transform: uppercase; }
         .btn-action-sm.equipped { background: rgba(16, 185, 129, 0.3); border-color: #10b981; color: #34d399; }
+        .btn-action-sm.owned { background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #fbbf24; }
 
         .streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 8px; }
         .streak-card { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 10px; padding: 8px 4px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
@@ -165,6 +166,24 @@
     </style>
 </head>
 <body>
+
+    <!-- TASK 1: PROFESSIONAL ANIMATED LOADING SCREEN -->
+    <div class="screen-overlay" id="loading-overlay" style="display: flex; z-index: 500; background: #070a12; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.6s ease; pointer-events: auto;">
+        <div style="font-size: 34px; font-weight: 900; letter-spacing: 3px; background: linear-gradient(135deg, #fbbf24, #f87171, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 25px;">RIMSHOT 1v1</div>
+        
+        <!-- Animated Dribble Stage (A to B) -->
+        <div style="width: 320px; height: 90px; position: relative; border-bottom: 2px solid rgba(255,255,255,0.15); margin-bottom: 20px; overflow: hidden;">
+            <div id="loading-ball" style="position: absolute; bottom: 0; left: 0; font-size: 32px; transform: translateY(0); transition: left 0.1s linear;">🏀</div>
+        </div>
+        
+        <!-- Loading Progress Bar -->
+        <div style="width: 300px; height: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; box-shadow: 0 0 15px rgba(251,191,36,0.25);">
+            <div id="loading-bar-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #f59e0b, #fde047); border-radius: 10px; transition: width 0.08s linear;"></div>
+        </div>
+        
+        <!-- Percentage Indicator -->
+        <div id="loading-percent-text" style="font-family: 'Share Tech Mono', monospace; font-size: 18px; font-weight: bold; color: #fbbf24; margin-top: 14px;">LOADING 1%</div>
+    </div>
 
     <div class="game-wrapper">
         <div class="top-meta-bar">
@@ -276,23 +295,24 @@
                 </div>
             </div>
 
+            <!-- TASK 2: ENRICHED EQUIPMENT & CUSTOMIZATION SHOP -->
             <div class="screen-overlay hidden" id="modal-shop">
                 <div class="modal-card">
-                    <div class="modal-header"><div class="modal-title">🛒 RIMSHOT EQUIPMENT SHOP</div><button class="btn-close-modal" onclick="closeModal('modal-shop')">✕</button></div>
-                    <div style="font-size: 12px; font-weight: 800; color: var(--gold-accent); text-align: left;">🏀 Basketballs Collection</div>
-                    <div class="shop-grid">
-                        <div class="shop-item-card">
-                            <div class="shop-item-icon">🏀</div><div class="shop-item-name">Classic Orange</div><div class="shop-item-price">DEFAULT</div><button class="btn-action-sm equipped">EQUIPPED</button>
-                        </div>
-                        <div class="shop-item-card">
-                            <div class="shop-item-icon">🌟</div><div class="shop-item-name">Golden Pro Ball</div><div class="shop-item-price">1,500 🪙</div><button class="btn-action-sm" onclick="alert('Equipped Golden Pro Ball!')">EQUIP</button>
-                        </div>
-                        <div class="shop-item-card">
-                            <div class="shop-item-icon">🔥</div><div class="shop-item-name">Flame Fire Ball</div><div class="shop-item-price">3,000 🪙</div><button class="btn-action-sm" onclick="alert('Equipped Flame Fire Ball!')">EQUIP</button>
-                        </div>
-                        <div class="shop-item-card">
-                            <div class="shop-item-icon">💎</div><div class="shop-item-name">Diamond Cyber</div><div class="shop-item-price">5,000 🪙</div><button class="btn-action-sm" onclick="alert('Equipped Diamond Cyber Ball!')">EQUIP</button>
-                        </div>
+                    <div class="modal-header">
+                        <div class="modal-title">🛒 RIMSHOT EQUIPMENT SHOP</div>
+                        <button class="btn-close-modal" onclick="closeModal('modal-shop')">✕</button>
+                    </div>
+                    
+                    <div style="display:flex; gap:8px; margin-bottom:10px; overflow-x:auto; padding-bottom:4px;">
+                        <button class="btn-toggle active" id="shop-filter-all" onclick="filterShopCategory('all')">🌟 ALL ITEMS</button>
+                        <button class="btn-toggle" id="shop-filter-ball" onclick="filterShopCategory('ball')">🏀 BALLS</button>
+                        <button class="btn-toggle" id="shop-filter-shoes" onclick="filterShopCategory('shoes')">👟 SNEAKERS</button>
+                        <button class="btn-toggle" id="shop-filter-jersey" onclick="filterShopCategory('jersey')">🎽 JERSEYS</button>
+                        <button class="btn-toggle" id="shop-filter-trail" onclick="filterShopCategory('trail')">✨ TRAILS</button>
+                    </div>
+
+                    <div class="shop-grid" id="shop-items-container">
+                        <!-- Dynamically populated via renderShopGrid() -->
                     </div>
                 </div>
             </div>
@@ -309,7 +329,7 @@
                         <div class="streak-card"><div class="streak-day">DAY 6</div><div class="streak-reward">🪙</div><div style="font-size:9px; font-weight:bold;">3,500</div></div>
                         <div class="streak-card" style="border-color:var(--gold-accent);"><div class="streak-day">DAY 7</div><div class="streak-reward">🏆</div><div style="font-size:9px; font-weight:bold;">GRAND</div></div>
                     </div>
-                    <button class="btn-start-gold" style="font-size: 12px; padding: 10px 0; margin-top: 10px; width:100%;" onclick="alert('Claimed 500 Coins for Day 1!')">CLAIM TODAY'S REWARD 🎁</button>
+                    <button class="btn-start-gold" style="font-size: 12px; padding: 10px 0; margin-top: 10px; width:100%;" onclick="claimDailyReward()">CLAIM TODAY'S REWARD 🎁</button>
                 </div>
             </div>
 
@@ -407,6 +427,128 @@
     </div>
 
     <script>
+        // TASK 2: FULL SHOP CATALOG & STATE MANAGEMENT
+        const SHOP_CATALOG = [
+            // BASKETBALL SKINS
+            { category: 'ball', id: 'ball_default', name: 'Classic Orange', icon: '🏀', price: 0 },
+            { category: 'ball', id: 'ball_golden', name: 'Golden Pro Ball', icon: '🌟', price: 1500 },
+            { category: 'ball', id: 'ball_flame', name: 'Flame Fire Ball', icon: '🔥', price: 3000 },
+            { category: 'ball', id: 'ball_cyber', name: 'Cyberpunk Glow', icon: '💎', price: 5000 },
+            { category: 'ball', id: 'ball_galaxy', name: 'Galaxy Nebula', icon: '🌌', price: 8000 },
+            { category: 'ball', id: 'ball_neon', name: 'Retro Neon Ball', icon: '⚡', price: 12000 },
+
+            // SNEAKERS & KROSSOVKALAR
+            { category: 'shoes', id: 'shoes_default', name: 'Classic Keds', icon: '👟', price: 0 },
+            { category: 'shoes', id: 'shoes_jordan', name: 'Air Jordan Red', icon: '🔴', price: 2500 },
+            { category: 'shoes', id: 'shoes_cyber', name: 'Cyber Neon Keds', icon: '🟢', price: 6000 },
+            { category: 'shoes', id: 'shoes_gold', name: 'Golden Boots', icon: '👑', price: 10000 },
+
+            // JERSEYS & FORMALAR
+            { category: 'jersey', id: 'jersey_default', name: 'Yellow #23', icon: '🎽', price: 0 },
+            { category: 'jersey', id: 'jersey_lakers', name: 'Lakers Gold #24', icon: '💜', price: 3500 },
+            { category: 'jersey', id: 'jersey_bulls', name: 'Bulls Red #23', icon: '❤️', price: 7000 },
+            { category: 'jersey', id: 'jersey_stealth', name: 'Cyber Black', icon: '🖤', price: 15000 },
+
+            // AURA & TRAIL EFFEKTLARI
+            { category: 'trail', id: 'trail_default', name: 'Standard Air', icon: '💨', price: 0 },
+            { category: 'trail', id: 'trail_fire', name: 'Fire Sparks', icon: '💥', price: 4000 },
+            { category: 'trail', id: 'trail_rainbow', name: 'Rainbow Glow', icon: '🌈', price: 9000 },
+            { category: 'trail', id: 'trail_lightning', name: 'Electric Spark', icon: '⚡', price: 14000 }
+        ];
+
+        let currentShopCategory = 'all';
+        let userCoins = parseInt(localStorage.getItem('rimshot_coins') || '2400', 10);
+        let ownedItemIds = JSON.parse(localStorage.getItem('rimshot_owned_items') || '["ball_default", "shoes_default", "jersey_default", "trail_default"]');
+        let equippedItems = JSON.parse(localStorage.getItem('rimshot_equipped') || '{"ball":"ball_default", "shoes":"shoes_default", "jersey":"jersey_default", "trail":"trail_default"}');
+
+        function updateCoinsUI() {
+            localStorage.setItem('rimshot_coins', userCoins.toString());
+            document.getElementById('meta-coins').innerText = userCoins.toLocaleString();
+        }
+
+        function filterShopCategory(cat) {
+            currentShopCategory = cat;
+            ['all', 'ball', 'shoes', 'jersey', 'trail'].forEach(c => {
+                const btn = document.getElementById(`shop-filter-${c}`);
+                if (btn) {
+                    if (c === cat) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
+            });
+            renderShopGrid();
+        }
+
+        function renderShopGrid() {
+            const container = document.getElementById('shop-items-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const itemsToDisplay = currentShopCategory === 'all' 
+                ? SHOP_CATALOG 
+                : SHOP_CATALOG.filter(i => i.category === currentShopCategory);
+
+            itemsToDisplay.forEach(item => {
+                const isOwned = ownedItemIds.includes(item.id);
+                const isEquipped = equippedItems[item.category] === item.id;
+
+                const card = document.createElement('div');
+                card.className = 'shop-item-card';
+
+                let btnHTML = '';
+                if (isEquipped) {
+                    btnHTML = `<button class="btn-action-sm equipped">EQUIPPED 🟢</button>`;
+                } else if (isOwned) {
+                    btnHTML = `<button class="btn-action-sm owned" onclick="buyOrEquipItem('${item.id}')">EQUIP</button>`;
+                } else {
+                    btnHTML = `<button class="btn-action-sm" onclick="buyOrEquipItem('${item.id}')">BUY ${item.price.toLocaleString()} 🪙</button>`;
+                }
+
+                card.innerHTML = `
+                    <div class="shop-item-icon">${item.icon}</div>
+                    <div class="shop-item-name">${item.name}</div>
+                    <div class="shop-item-price">${item.price === 0 ? 'DEFAULT' : item.price.toLocaleString() + ' 🪙'}</div>
+                    ${btnHTML}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function buyOrEquipItem(itemId) {
+            const item = SHOP_CATALOG.find(i => i.id === itemId);
+            if (!item) return;
+
+            if (!ownedItemIds.includes(item.id)) {
+                if (userCoins < item.price) {
+                    alert(`⚠️ Tanganiz yetarli emas! Bu mahsulot narxi: ${item.price.toLocaleString()} 🪙`);
+                    return;
+                }
+                userCoins -= item.price;
+                ownedItemIds.push(item.id);
+                localStorage.setItem('rimshot_owned_items', JSON.stringify(ownedItemIds));
+                updateCoinsUI();
+            }
+
+            equippedItems[item.category] = item.id;
+            localStorage.setItem('rimshot_equipped', JSON.stringify(equippedItems));
+            
+            // Apply equip dynamics to player
+            if (item.category === 'jersey') {
+                if (item.id === 'jersey_lakers') pUser.jerseyColor = '#fdb927';
+                else if (item.id === 'jersey_bulls') pUser.jerseyColor = '#ce1141';
+                else if (item.id === 'jersey_stealth') pUser.jerseyColor = '#111827';
+                else pUser.jerseyColor = '#F59E0B';
+            }
+
+            renderShopGrid();
+        }
+
+        function claimDailyReward() {
+            userCoins += 500;
+            updateCoinsUI();
+            alert('🎁 Qutlaymiz! bugungi kun uchun 500 Tanga qabul qilindi!');
+            closeModal('modal-daily');
+        }
+
         class SoundSynth {
             constructor() { this.ctx = null; this.enabled = true; this.bgmTimer = null; }
             init() { if (this.ctx) return; try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} }
@@ -527,7 +669,7 @@
         function restartMatchDirect() { resumeMatch(); startGame(); }
         
         function closeAllModals() {
-            document.querySelectorAll('.screen-overlay:not(#setup-overlay)').forEach(m => {
+            document.querySelectorAll('.screen-overlay:not(#setup-overlay):not(#loading-overlay)').forEach(m => {
                 m.classList.add('hidden');
                 if(m.id==='pause-overlay') m.style.display='none';
             });
@@ -541,6 +683,7 @@
                 const activeTab = document.getElementById(tabId);
                 if (activeTab) activeTab.classList.add('active');
             }
+            if (modalId === 'modal-shop') renderShopGrid();
         }
 
         function closeModal(modalId) {
@@ -610,6 +753,7 @@
                 userPhotoDataURL = photo;
                 document.getElementById('profile-avatar-box').innerHTML = `<img src="${photo}" class="avatar-img">`;
             }
+            updateCoinsUI();
         }
 
         function updateNationFlags() {
@@ -743,9 +887,16 @@
 
                 ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.strokeStyle = this.skinTone;
                 ctx.beginPath(); ctx.moveTo(-6, -34); ctx.lineTo(-6 - stride * 14, -18); ctx.lineTo(-6 - stride * 18, 0); ctx.stroke();
-                ctx.fillStyle = '#ffffff'; ctx.fillRect(-10 - stride * 18, -4, 14, 6); ctx.fillStyle = '#000'; ctx.fillRect(-10 - stride * 18, 0, 14, 3);
+                
+                // Shoe skin rendering
+                let shoeColor = '#ffffff';
+                if (equippedItems.shoes === 'shoes_jordan') shoeColor = '#dc2626';
+                else if (equippedItems.shoes === 'shoes_cyber') shoeColor = '#10b981';
+                else if (equippedItems.shoes === 'shoes_gold') shoeColor = '#fbbf24';
+
+                ctx.fillStyle = shoeColor; ctx.fillRect(-10 - stride * 18, -4, 14, 6); ctx.fillStyle = '#000'; ctx.fillRect(-10 - stride * 18, 0, 14, 3);
                 ctx.beginPath(); ctx.moveTo(6, -34); ctx.lineTo(6 + stride * 14, -18); ctx.lineTo(6 + stride * 18, 0); ctx.stroke();
-                ctx.fillStyle = '#ffffff'; ctx.fillRect(2 + stride * 18, -4, 14, 6); ctx.fillStyle = '#000'; ctx.fillRect(2 + stride * 18, 0, 14, 3);
+                ctx.fillStyle = shoeColor; ctx.fillRect(2 + stride * 18, -4, 14, 6); ctx.fillStyle = '#000'; ctx.fillRect(2 + stride * 18, 0, 14, 3);
 
                 ctx.fillStyle = this.jerseyColor;
                 ctx.beginPath(); ctx.moveTo(-14, -80); ctx.lineTo(14, -80); ctx.lineTo(12, -34); ctx.lineTo(-12, -34); ctx.closePath(); ctx.fill();
@@ -782,7 +933,6 @@
                 if (this.x <= 20 || this.x >= 1260) this.vx = -this.vx * 0.7;
 
                 // PERFECT CONTINUOUS SCORING DETECTION FOR BOTH USER AND BOT:
-                // Triggers 100% reliably whenever ball moves downward through Left Rim (250, 243) or Right Rim (1024, 243)
                 if (this.vy > 0 && !this.hasScored) {
                     if (this.prevY <= 255 && this.y >= 235) {
                         if (this.x >= 220 && this.x <= 285) {
@@ -799,8 +949,23 @@
                 ctx.restore();
 
                 ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rotation);
+                
+                // Ball Skin Gradient rendering based on shop equipped items
                 let bGrad = ctx.createRadialGradient(-4, -4, 2, 0, 0, this.radius);
-                bGrad.addColorStop(0, '#f97316'); bGrad.addColorStop(0.7, '#ea580c'); bGrad.addColorStop(1, '#c2410c');
+                if (equippedItems.ball === 'ball_golden') {
+                    bGrad.addColorStop(0, '#fef08a'); bGrad.addColorStop(0.7, '#eab308'); bGrad.addColorStop(1, '#ca8a04');
+                } else if (equippedItems.ball === 'ball_flame') {
+                    bGrad.addColorStop(0, '#ef4444'); bGrad.addColorStop(0.7, '#dc2626'); bGrad.addColorStop(1, '#991b1b');
+                } else if (equippedItems.ball === 'ball_cyber') {
+                    bGrad.addColorStop(0, '#38bdf8'); bGrad.addColorStop(0.7, '#0284c7'); bGrad.addColorStop(1, '#092540');
+                } else if (equippedItems.ball === 'ball_galaxy') {
+                    bGrad.addColorStop(0, '#a855f7'); bGrad.addColorStop(0.7, '#7e22ce'); bGrad.addColorStop(1, '#3b0764');
+                } else if (equippedItems.ball === 'ball_neon') {
+                    bGrad.addColorStop(0, '#4ade80'); bGrad.addColorStop(0.7, '#16a34a'); bGrad.addColorStop(1, '#14532d');
+                } else {
+                    bGrad.addColorStop(0, '#f97316'); bGrad.addColorStop(0.7, '#ea580c'); bGrad.addColorStop(1, '#c2410c');
+                }
+
                 ctx.fillStyle = bGrad; ctx.beginPath(); ctx.arc(0, 0, this.radius, 0, Math.PI*2); ctx.fill();
                 
                 ctx.strokeStyle = '#1e1b18'; ctx.lineWidth = 1.8;
@@ -842,7 +1007,7 @@
                 }
             }
             keysPressed[k] = false;
-            handleKeyRelease(key);
+            handleKeyRelease(k);
         });
 
         function handleKeyPress(key) {
@@ -930,17 +1095,13 @@
                 ctx.fillStyle = grad; ctx.fillRect(0, 0, 1280, 530);
                 
                 ctx.save();
-                // Glowing outer aura centered at 200, 80
                 let moonAura = ctx.createRadialGradient(200, 80, 5, 200, 80, 40);
                 moonAura.addColorStop(0, 'rgba(248, 250, 252, 0.85)');
                 moonAura.addColorStop(0.5, 'rgba(226, 232, 240, 0.35)');
                 moonAura.addColorStop(1, 'rgba(226, 232, 240, 0)');
                 ctx.fillStyle = moonAura; ctx.beginPath(); ctx.arc(200, 80, 40, 0, Math.PI * 2); ctx.fill();
 
-                // Centered white moon sphere at 200, 80
                 ctx.fillStyle = '#f8fafc'; ctx.beginPath(); ctx.arc(200, 80, 18, 0, Math.PI * 2); ctx.fill();
-
-                // Softened translucent shadow shifted slightly RIGHT (208, 80) so white crescent curves towards the RIGHT (🌙)
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.82)'; ctx.beginPath(); ctx.arc(208, 80, 16, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
 
@@ -1135,11 +1296,15 @@
                 winnerScore = userScore;
                 winnerPhotoHTML = userPhotoDataURL ? `<img src="${userPhotoDataURL}" class="avatar-img">` : '👤';
                 document.getElementById('end-winner-text').innerText = `🏆 ${userName.toUpperCase()} WINS THE CHAMPIONSHIP!`;
+                userCoins += 1500; // Winner bonus!
+                updateCoinsUI();
             } else {
                 winnerName = "Bot #99";
                 winnerScore = botScore;
                 winnerPhotoHTML = '🤖';
                 document.getElementById('end-winner-text').innerText = `🤖 BOT #99 WINS THE MATCH!`;
+                userCoins += 500; // Runner up bonus!
+                updateCoinsUI();
             }
 
             document.getElementById('winner-name-text').innerText = winnerName;
@@ -1154,7 +1319,45 @@
 
         function restartGame() { closeModal('gameover-screen'); document.getElementById('setup-overlay').style.display = 'flex'; }
 
+        // TASK 1 ANIMATED DRIBBLE LOADING SCREEN LOGIC
+        function startLoadingScreenAnimation() {
+            const overlay = document.getElementById('loading-overlay');
+            const ball = document.getElementById('loading-ball');
+            const fill = document.getElementById('loading-bar-fill');
+            const text = document.getElementById('loading-percent-text');
+            if (!overlay || !ball || !fill || !text) return;
+            
+            let progress = 1;
+            const interval = setInterval(() => {
+                progress += 1.6;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    fill.style.width = '100%';
+                    text.innerText = 'READY 100%';
+                    ball.style.left = '285px';
+                    
+                    setTimeout(() => {
+                        overlay.style.opacity = '0';
+                        setTimeout(() => {
+                            overlay.style.display = 'none';
+                        }, 600);
+                    }, 300);
+                } else {
+                    fill.style.width = progress + '%';
+                    text.innerText = `LOADING ${Math.floor(progress)}%`;
+                    
+                    // Dribble animation math
+                    const leftPx = (progress / 100) * 285;
+                    const bounceY = -Math.abs(Math.sin(progress * 0.28)) * 42;
+                    ball.style.left = leftPx + 'px';
+                    ball.style.transform = `translateY(${bounceY}px) rotate(${progress * 12}deg)`;
+                }
+            }, 30);
+        }
+
         window.addEventListener('load', () => {
+            startLoadingScreenAnimation();
             loadSavedProfileData();
             setupMobileTouchControls();
             initTelegramWebApp();
