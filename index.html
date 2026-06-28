@@ -781,13 +781,13 @@
                 if (this.y + this.radius >= 530) { this.y = 530 - this.radius; this.vy = -this.vy * 0.76; if (Math.abs(this.vy)>1.5) synth.playBounce(); }
                 if (this.x <= 20 || this.x >= 1260) this.vx = -this.vx * 0.7;
 
-                // STRICT NET COLLISION SCORING:
-                // Triggers ONLY when ball moves DOWNWARDS (vy > 0), crossed the rim Y (243) from top, and is horizontally inside rim cylinder!
-                if (this.vy > 0.5 && !this.hasScored && this.prevY < 250 && this.y >= 240 && this.y <= 280) {
-                    if (this.x >= 210 && this.x <= 275) {
-                        processScore(true); // Left Hoop -> Bot Score
-                    } else if (this.x >= 1005 && this.x <= 1070) {
-                        processScore(false); // Right Hoop -> User Score
+                // FOOLPROOF NET ENTRY DETECTION:
+                // Triggers ONLY when ball moves DOWNWARDS (vy > 0), crossed rim level (243) from top, and is strictly within drawn rim width!
+                if (this.vy > 0.5 && !this.hasScored && this.prevY < 243 && this.y >= 243 && this.y <= 270) {
+                    if (this.x >= 235 && this.x <= 275) {
+                        processScore(true); // Left Hoop Rim -> Bot Score
+                    } else if (this.x >= 1002 && this.x <= 1046) {
+                        processScore(false); // Right Hoop Rim -> User Score
                     }
                 }
             }
@@ -866,7 +866,7 @@
             ball.hasScored = false;
             ball.immunityTimer = 35; // 35 frames of possession immunity so ball can fly freely!
 
-            const targetX = player.isUser ? 1038 : 242;
+            const targetX = player.isUser ? 1024 : 250;
             const targetY = 243;
             if (player.onGround) {
                 player.vy = -11.0; player.onGround = false;
@@ -883,6 +883,8 @@
 
         function processScore(isLeftHoop) {
             ball.hasScored = true;
+            ball.vx = 0; ball.vy = 3.0; // Drop straight down through net
+            
             if (isLeftHoop) {
                 botScore += 2; spectatorsList.forEach(row => row.forEach((spec, idx) => { if(idx >= 12) spec.reactTimer = 85; }));
             } else {
@@ -890,11 +892,11 @@
             }
             document.getElementById('score-user').innerText = String(userScore).padStart(2,'0');
             document.getElementById('score-bot').innerText = String(botScore).padStart(2,'0');
-            synth.playSwish(); triggerTextPopup(isLeftHoop ? 230 : 1050, 210, '+2 GOAL!', '#fbbf24');
+            synth.playSwish(); triggerTextPopup(isLeftHoop ? 250 : 1024, 210, '+2 GOAL!', '#fbbf24');
             
             setTimeout(() => {
-                ball.x = 640; ball.y = 180; ball.vx = 0; ball.vy = 0; ball.hasScored = false;
-            }, 1200);
+                ball.x = 640; ball.y = 200; ball.vx = 0; ball.vy = 0; ball.hasScored = false;
+            }, 1000);
         }
 
         function handlePossession() {
