@@ -259,7 +259,7 @@
             <div class="screen-overlay hidden" id="modal-tournament">
                 <div class="modal-card" style="width: 650px; text-align: center;">
                     <div class="modal-header"><div class="modal-title">🏆 GRAND TURNIR KUBOGI</div><button class="btn-close-modal" onclick="closeModal('modal-tournament')">✕</button></div>
-                    <div style="display: flex; justify-content: space-around; align-items: center; margin: 16px 0; gap: 6px; flex-wrap: wrap;">
+                    <div style="display: flex; justify-space-around; align-items: center; margin: 16px 0; gap: 6px; flex-wrap: wrap;">
                         <div style="background: rgba(16, 185, 129, 0.15); padding: 12px; border-radius: 12px; border: 1px solid #10b981; min-width: 100px;">
                             <div style="font-size: 10px; color: #10b981;">1/4 FINAL</div><div style="font-weight: 900; color: #fff;">VICTORY 🟢</div>
                         </div>
@@ -703,20 +703,24 @@
                 }
             }
             updateBotAI() {
-                let speedLimit = botDifficulty === 'easy' ? 3.0 : (botDifficulty === 'hard' ? 6.5 : 4.8);
+                let speedLimit = botDifficulty === 'easy' ? 3.2 : (botDifficulty === 'hard' ? 6.0 : 4.6);
                 if (ball.carrier === this) {
-                    const distToHoop = Math.abs(this.x - 230);
-                    if (distToHoop > 130) { this.vx = -speedLimit; this.facing = -1; }
+                    const idealZoneX = 480;
+                    if (this.x > idealZoneX + 30) { this.vx = -speedLimit; this.facing = -1; }
+                    else if (this.x < idealZoneX - 30) { this.vx = speedLimit; this.facing = 1; }
                     else {
-                        if (this.onGround) {
-                            performThrow(this, 90);
-                        }
+                        this.vx *= 0.8;
+                        performThrow(this, 85);
                     }
                 } else if (ball.carrier === pUser) {
-                    let targetX = Math.min(1080, pUser.x + 45);
-                    if (this.x < targetX) { this.vx = speedLimit; this.facing = 1; } else if (this.x > targetX) { this.vx = -speedLimit; this.facing = -1; }
+                    let guardX = Math.min(1150, pUser.x + 60);
+                    if (this.x < guardX - 10) { this.vx = speedLimit; this.facing = 1; }
+                    else if (this.x > guardX + 10) { this.vx = -speedLimit; this.facing = -1; }
+                    else { this.vx *= 0.8; }
                 } else {
-                    if (this.x < ball.x) { this.vx = speedLimit; this.facing = 1; } else { this.vx = -speedLimit; this.facing = -1; }
+                    if (this.x < ball.x - 10) { this.vx = speedLimit; this.facing = 1; }
+                    else if (this.x > ball.x + 10) { this.vx = -speedLimit; this.facing = -1; }
+                    else { this.vx *= 0.8; }
                 }
                 this.x += this.vx;
                 if (!this.onGround) { this.vy += 0.52; this.y += this.vy; if (this.y >= 530) { this.y = 530; this.vy = 0; this.onGround = true; } }
@@ -770,9 +774,9 @@
                 if (this.x <= 20 || this.x >= 1260) this.vx = -this.vx * 0.7;
 
                 if (this.vy > 0.1 && !this.hasScored) {
-                    if (this.y >= 240 && this.y <= 260) {
-                        if (this.x >= 200 && this.x <= 260) processScore(true);
-                        else if (this.x >= 1020 && this.x <= 1080) processScore(false);
+                    if (this.y >= 230 && this.y <= 270) {
+                        if (this.x >= 210 && this.x <= 280) processScore(true);
+                        else if (this.x >= 1000 && this.x <= 1070) processScore(false);
                     }
                 }
             }
@@ -848,12 +852,16 @@
         function performThrow(player, power) {
             if (!ball.isCarried || ball.carrier !== player) return;
             ball.isCarried = false; ball.carrier = null;
-            const targetX = player.isUser ? 1050 : 230;
+            
+            const targetX = player.isUser ? 1035 : 245;
+            if (player.onGround && Math.random() > 0.3) {
+                player.vy = -12.0; player.onGround = false;
+            }
             const dx = targetX - ball.x;
-            ball.vx = dx / 34;
-            ball.vy = -12.5;
+            ball.vx = dx / 35;
+            ball.vy = -13.5;
             synth.playSwish();
-            triggerTextPopup(player.x, player.y - 50, 'SHOOT! 🏀', '#f59e0b');
+            triggerTextPopup(player.x, player.y - 50, 'SHOOT! 🏀', player.isUser ? '#f59e0b' : '#ffffff');
         }
 
         function processScore(isLeftHoop) {
