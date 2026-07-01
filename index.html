@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>RimShot Pro 3D — Lifelike NBA 2K Arena Experience</title>
+<title>NBA Pro Basketball 3D — Official NBA 2K Mobile Experience</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <!-- Three.js 3D Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -13,39 +13,48 @@ html,body{width:100%;height:100%;overflow:hidden;background:#030712;font-family:
 #container{position:relative;width:100%;height:100%}
 canvas{display:block;width:100%;height:100%}
 
-/* HUD & UI */
-#hud{position:fixed;top:0;left:0;width:100%;z-index:50;background:linear-gradient(to bottom,rgba(3,7,18,.95),rgba(3,7,18,.7));backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.12);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.hs{display:flex;align-items:center;background:#020617;border:2px solid rgba(255,255,255,.18);border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.7)}
-.hs-t{display:flex;align-items:center;gap:10px;padding:6px 16px}
-.hs-n{font-family:'Share Tech Mono',monospace;font-size:32px;font-weight:bold}
-.hs-c{padding:6px 18px;font-family:'Share Tech Mono',monospace;font-size:26px;font-weight:bold;color:#fbbf24;border-left:2px solid rgba(255,255,255,.12);border-right:2px solid rgba(255,255,255,.12);background:rgba(251,191,36,.06)}
-.hs-c.urg{color:#ef4444;animation:blnk .5s infinite alternate}
+/* 1. NBA TV BROADCAST SCOREBOARD (Top-Left just like screenshot) */
+#nba-scoreboard{position:fixed;top:15px;left:15px;z-index:50;display:flex;align-items:center;background:rgba(15,23,42,.92);border:2px solid rgba(255,255,255,.2);border-radius:30px;padding:6px 16px;box-shadow:0 8px 30px rgba(0,0,0,.8);gap:12px;font-family:'Outfit',sans-serif}
+.sc-tag{font-size:12px;font-weight:900;letter-spacing:1.5px;color:#94a3b8;text-transform:uppercase;border-right:1px solid rgba(255,255,255,.15);padding-right:10px}
+.sc-team{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:900}
+.sc-flag{font-size:20px}
+.sc-score{background:#dc2626;color:#fff;font-family:'Share Tech Mono',monospace;font-size:22px;font-weight:bold;padding:2px 10px;border-radius:8px;box-shadow:0 0 15px rgba(220,38,38,.5)}
+.sc-timer{font-family:'Share Tech Mono',monospace;font-size:20px;font-weight:bold;color:#fbbf24;padding-left:8px;border-left:1px solid rgba(255,255,255,.15)}
+.sc-timer.urg{color:#ef4444;animation:blnk .5s infinite alternate}
 @keyframes blnk{from{opacity:1}to{opacity:.3}}
-.hm{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.hb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700}
-.hb.gld{background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.4);color:#fbbf24}
-.hbtn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#cbd5e1;padding:6px 14px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;transition:.2s}
-.hbtn:hover{background:rgba(255,255,255,.22);color:#fff}
+
+/* Top Right UI & Audio Controls */
+#top-right-ui{position:fixed;top:15px;right:15px;z-index:50;display:flex;gap:10px}
+.hbtn{background:rgba(15,23,42,.88);border:1.5px solid rgba(255,255,255,.2);color:#cbd5e1;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:800;transition:.2s;box-shadow:0 4px 15px rgba(0,0,0,.6)}
+.hbtn:hover{background:rgba(255,255,255,.2);color:#fff}
 
 /* Instructions Banner */
 #instructions{position:fixed;top:72px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,.9);border:1px solid rgba(251,191,36,.4);padding:8px 20px;border-radius:24px;font-size:12px;color:#e2e8f0;z-index:45;pointer-events:none;display:flex;gap:16px;align-items:center;box-shadow:0 6px 25px rgba(0,0,0,.6)}
 .key{background:#334155;color:#fbbf24;padding:2px 8px;border-radius:6px;font-weight:800;font-family:'Share Tech Mono',monospace;border:1px solid rgba(255,255,255,.1)}
 
-/* Minimap */
-#minimap-wrap{position:fixed;bottom:20px;right:20px;width:200px;height:112px;background:rgba(3,7,18,.9);border:2px solid rgba(255,255,255,.2);border-radius:14px;overflow:hidden;z-index:55;box-shadow:0 8px 30px rgba(0,0,0,.8)}
-#minimap{width:100%;height:100%;display:block}
+/* 2. NBA 2K MOBILE ACTION BUTTONS (Right Side just like screenshots) */
+#action-pad{position:fixed;bottom:25px;right:25px;z-index:60;display:flex;flex-direction:column;gap:14px;align-items:flex-end}
+.act-row{display:flex;gap:14px;align-items:center}
+.act-btn{width:72px;height:72px;border-radius:50%;background:radial-gradient(circle,rgba(30,41,59,.95),rgba(15,23,42,.95));border:3px solid rgba(255,255,255,.3);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 25px rgba(0,0,0,.8);cursor:pointer;user-select:none;transition:.15s;position:relative;overflow:hidden}
+.act-btn:active{transform:scale(.92);border-color:#fbbf24}
+.act-btn.shoot{width:86px;height:86px;background:radial-gradient(circle,#f59e0b,#b45309);border-color:#fde047;box-shadow:0 0 30px rgba(245,158,11,.6)}
+.act-btn.dunk{width:80px;height:80px;background:radial-gradient(circle,#ef4444,#991b1b);border-color:#fca5a5;box-shadow:0 0 25px rgba(239,68,68,.5)}
+.act-icon{font-size:26px;margin-bottom:2px}
+.act-lbl{font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
 
-/* Touch controls for mobile/tablet */
-#tpad{position:fixed;bottom:20px;left:20px;display:flex;gap:14px;z-index:60}
-.tbtn{width:60px;height:60px;border-radius:50%;background:rgba(15,23,42,.85);border:2px solid rgba(255,255,255,.25);color:#fff;font-size:20px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.7);cursor:pointer;user-select:none}
-.tbtn:active{transform:scale(.92);background:rgba(245,158,11,.85)}
-.tbtn.shoot{background:linear-gradient(135deg,#f59e0b,#d97706);border-color:#fde047;width:70px;height:70px;font-size:24px}
+/* 3. D-PAD / VIRTUAL JOYSTICK (Bottom-Left just like screenshots) */
+#dpad-wrap{position:fixed;bottom:25px;left:25px;z-index:60;width:150px;height:150px;background:rgba(15,23,42,.6);border:2px dashed rgba(255,255,255,.25);border-radius:50%;display:flex;align-items:center;justify-content:center}
+#dpad-stick{width:60px;height:60px;background:radial-gradient(circle,#38bdf8,#0284c7);border:2px solid #fff;border-radius:50%;box-shadow:0 4px 15px rgba(0,0,0,.7);pointer-events:none;transition:.08s}
+
+/* Minimap */
+#minimap-wrap{position:fixed;top:70px;right:15px;width:180px;height:100px;background:rgba(3,7,18,.9);border:2px solid rgba(255,255,255,.2);border-radius:14px;overflow:hidden;z-index:55;box-shadow:0 8px 30px rgba(0,0,0,.8)}
+#minimap{width:100%;height:100%;display:block}
 
 /* Overlays */
 .ov{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(3,7,18,.96);backdrop-filter:blur(24px);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:20px}
 .ov.hid{display:none!important}
-.big{font-size:52px;font-weight:900;letter-spacing:4px;background:linear-gradient(135deg,#fbbf24,#f87171,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;text-shadow:0 10px 30px rgba(251,191,36,.2)}
-.card{background:rgba(15,23,42,.92);border:1.5px solid rgba(255,255,255,.18);border-radius:24px;padding:24px 28px;width:420px;max-width:95%;display:flex;flex-direction:column;gap:14px;box-shadow:0 15px 40px rgba(0,0,0,.8)}
+.big{font-size:54px;font-weight:900;letter-spacing:4px;background:linear-gradient(135deg,#fbbf24,#f87171,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;text-shadow:0 10px 30px rgba(251,191,36,.2)}
+.card{background:rgba(15,23,42,.92);border:1.5px solid rgba(255,255,255,.18);border-radius:24px;padding:24px 28px;width:440px;max-width:95%;display:flex;flex-direction:column;gap:14px;box-shadow:0 15px 40px rgba(0,0,0,.8)}
 .card label{font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:1.5px}
 .card input,.card select{background:rgba(2,6,23,.95)!important;border:1.5px solid rgba(255,255,255,.2)!important;color:#fff!important;padding:12px 16px!important;border-radius:14px!important;font-size:15px!important;outline:none!important;width:100%!important;font-family:'Outfit',sans-serif!important}
 .btn-g{background:linear-gradient(135deg,#f59e0b,#d97706);border:none;color:#fff;font-size:18px;font-weight:900;padding:14px 40px;border-radius:35px;cursor:pointer;box-shadow:0 0 30px rgba(245,158,11,.6);letter-spacing:2px;text-transform:uppercase;transition:.25s}
@@ -56,48 +65,64 @@ canvas{display:block;width:100%;height:100%}
 </head>
 <body>
 <div id="container">
-  <div id="hud">
-    <div class="hm">
-      <div class="hb" id="hud-flag">🇺🇿 Baller_Pro</div>
-      <div class="hb gld">🪙 <span id="hud-coins">3500</span></div>
-      <div class="hb" style="color:#38bdf8">🏛️ PRO ARENA STADIUM</div>
-    </div>
-    <div class="hs">
-      <div class="hs-t"><div style="font-size:11px;font-weight:800;color:#fbbf24">SARIQ</div><div class="hs-n" style="color:#fbbf24" id="sc-y">00</div></div>
-      <div class="hs-c" id="hud-timer">03:00</div>
-      <div class="hs-t"><div class="hs-n" style="color:#fff" id="sc-w">00</div><div style="font-size:11px;font-weight:800;color:#fff">OQ</div></div>
-    </div>
-    <div style="display:flex;gap:10px">
-      <button class="hbtn" onclick="toggleSnd()">🔊 Ovoz</button>
-      <button class="hbtn" onclick="togglePause()">⏸ Pause</button>
-    </div>
+  <!-- NBA TV BROADCAST SCOREBOARD -->
+  <div id="nba-scoreboard">
+    <div class="sc-tag">🏀 NBA PRO</div>
+    <div class="sc-team"><span class="sc-flag" id="flag-h">🇺🇸</span> <span id="name-h">USA</span></div>
+    <div class="sc-score"><span id="sc-y">00</span> - <span id="sc-w">00</span></div>
+    <div class="sc-team"><span id="name-a">PHI</span> <span class="sc-flag" id="flag-a">🇵🇭</span></div>
+    <div class="sc-timer" id="hud-timer">03:00</div>
+  </div>
+
+  <!-- Top Right UI -->
+  <div id="top-right-ui">
+    <button class="hbtn" onclick="toggleSnd()">🔊 Ovoz</button>
+    <button class="hbtn" onclick="togglePause()">⏸ Pause</button>
   </div>
 
   <div id="instructions">
-    <span>🖱️ <b>Sichqonchini bosing va buring</b> — 360° Kamera</span>
-    <span><span class="key">W / ⬆️</span> Olg'a yugurish</span>
-    <span><span class="key">Space</span> Sakrash</span>
-    <span><span class="key">K</span> Otish / Steal</span>
+    <span>🖱️ <b>Sichqonchini bosing & buring</b> — 360° Kamera</span>
+    <span><span class="key">W/A/S/D</span> Harakat</span>
+    <span><span class="key">Space</span> Sakrash/Dunk</span>
+    <span><span class="key">K</span> Otish</span>
     <span><span class="key">F</span> Pass</span>
-    <span><span class="key">E</span> Boost</span>
   </div>
 
   <div id="minimap-wrap"><canvas id="minimap"></canvas></div>
 
-  <div id="tpad">
-    <button class="tbtn" id="tj" title="Jump">🦘</button>
-    <button class="tbtn" id="tp" title="Pass">📤</button>
-    <button class="tbtn shoot" id="ts" title="Shoot/Steal">🏀</button>
-    <button class="tbtn" id="te" title="Boost">⚡</button>
+  <!-- VIRTUAL JOYSTICK (Bottom Left) -->
+  <div id="dpad-wrap"><div id="dpad-stick"></div></div>
+
+  <!-- NBA 2K MOBILE ACTION BUTTONS (Bottom Right) -->
+  <div id="action-pad">
+    <div class="act-row">
+      <button class="act-btn" id="btn-pass" title="Pass (F)"><div class="act-icon">📤</div><div class="act-lbl">Pass</div></button>
+      <button class="act-btn" id="btn-boost" title="Boost (E)"><div class="act-icon">⚡</div><div class="act-lbl">Boost</div></button>
+    </div>
+    <div class="act-row">
+      <button class="act-btn dunk" id="btn-dunk" title="Dunk/Jump (Space)"><div class="act-icon">🔥</div><div class="act-lbl">Dunk</div></button>
+      <button class="act-btn shoot" id="btn-shoot" title="Shoot/Steal (K)"><div class="act-icon">🏀</div><div class="act-lbl">Shoot</div></button>
+    </div>
   </div>
 
   <!-- OVERLAYS -->
   <div class="ov" id="ov-setup">
-    <div class="big">🏀 RIMSHOT PRO 3D</div>
-    <p style="color:#cbd5e1;font-size:16px;letter-spacing:1px;text-align:center">100% Hayotiy O'yinchilar & Pro Arena Stadion Tajribasi</p>
+    <div class="big">🏀 NBA 2K MOBILE</div>
+    <p style="color:#cbd5e1;font-size:16px;letter-spacing:1px;text-align:center">Rasmlardagi kabi 100% Realistik Arena & Muxlislar Atmosferasi</p>
     <div class="card">
-      <div><label>O'yinchi Ismi</label><input id="inp-name" value="Baller_Pro"/></div>
-      <div><label>Jamoa (Davlat)</label><select id="inp-country"><option value="🇺🇿">🇺🇿 O'zbekiston</option><option value="🇺🇸">🇺🇸 USA</option><option value="🇧🇷">🇧🇷 Brazil</option><option value="🇪🇸">🇪🇸 Spain</option></select></div>
+      <div><label>O'yinchi Ismi</label><input id="inp-name" value="Michael_23"/></div>
+      <div><label>Sizning Jamoangiz (Home)</label><select id="inp-home">
+        <option value="🇺🇸|USA" selected>🇺🇸 USA (America)</option>
+        <option value="🇺🇿|UZB">🇺🇿 UZB (O'zbekiston)</option>
+        <option value="🇦🇺|AUS">🇦🇺 AUS (Australia)</option>
+        <option value="🇪🇸|ESP">🇪🇸 ESP (Spain)</option>
+      </select></div>
+      <div><label>Raqib Jamoa (Away)</label><select id="inp-away">
+        <option value="🇵🇭|PHI" selected>🇵🇭 PHI (Philippines)</option>
+        <option value="🇨🇦|CAN">🇨🇦 CAN (Canada)</option>
+        <option value="🇧🇷|BRA">🇧🇷 BRA (Brazil)</option>
+        <option value="🇮🇷|IRA">🇮🇷 IRA (Iran)</option>
+      </select></div>
       <div><label>Qiyinlik darajasi</label><select id="inp-diff"><option value="easy">Oson (Yangi o'yinchilar)</option><option value="medium" selected>O'rta (Professional)</option><option value="hard">Qiyin (NBA Yulduzi)</option></select></div>
     </div>
     <button class="btn-g" onclick="startGame()">🏀 MAYDONGA CHIQISH</button>
@@ -156,12 +181,12 @@ let sndOn = true;
 function toggleSnd(){ sndOn=!sndOn; if(!sndOn) snd.stopBGM(); else if(gSt==='play') snd.startBGM(); }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 2. THREE.JS 3D ENGINE & LIGHTING
+// 2. THREE.JS 3D ENGINE & ATMOSPHERIC STADIUM LIGHTING
 // ═══════════════════════════════════════════════════════════════════════════
 const container = document.getElementById('container');
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x050814); // Deep stadium atmospheric blue
-scene.fog = new THREE.FogExp2(0x050814, 0.0018);
+scene.background = new THREE.Color(0x050814);
+scene.fog = new THREE.FogExp2(0x050814, 0.0016);
 
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.5, 1200);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -177,12 +202,12 @@ window.addEventListener('resize', ()=>{
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// Arena Bright Lighting
+// Vibrant Arena Lighting
 const ambLight = new THREE.AmbientLight(0xffffff, 0.65);
 scene.add(ambLight);
 
-const dirLight = new THREE.DirectionalLight(0xfff8e7, 1.1);
-dirLight.position.set(60, 140, 70);
+const dirLight = new THREE.DirectionalLight(0xfff8e7, 1.15);
+dirLight.position.set(60, 150, 80);
 dirLight.castShadow = true;
 dirLight.shadow.mapSize.width = 2048;
 dirLight.shadow.mapSize.height = 2048;
@@ -194,13 +219,13 @@ dirLight.shadow.camera.top = d; dirLight.shadow.camera.bottom = -d;
 dirLight.shadow.bias = -0.0005;
 scene.add(dirLight);
 
-const spotL = new THREE.PointLight(0xffaa44, 0.9, 150);
+const spotL = new THREE.PointLight(0xffaa44, 0.9, 160);
 spotL.position.set(-130, 60, 0); scene.add(spotL);
-const spotR = new THREE.PointLight(0xffaa44, 0.9, 150);
+const spotR = new THREE.PointLight(0xffaa44, 0.9, 160);
 spotR.position.set(130, 60, 0); scene.add(spotR);
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 3. REALISTIC NBA/FIBA PARQUET HARDWOOD COURT (No Soccer Markings!)
+// 3. VIBRANT NBA HARDWOOD COURT (Just like screenshots: Red/Blue key & yellow lines)
 // ═══════════════════════════════════════════════════════════════════════════
 const CW = 280, CH = 150;
 function createCourtTexture(){
@@ -208,17 +233,17 @@ function createCourtTexture(){
   cv.width = 2048; cv.height = 1024;
   const c = cv.getContext('2d');
   
-  // Parquet hardwood
-  c.fillStyle = '#c88a47'; c.fillRect(0, 0, 2048, 1024);
-  c.fillStyle = '#be803d';
+  // Golden hardwood parquet
+  c.fillStyle = '#d49753'; c.fillRect(0, 0, 2048, 1024);
+  c.fillStyle = '#ca8b47';
   for(let x=0; x<2048; x+=64){
     for(let y=0; y<1024; y+=32){
       if((x/64 + y/32)%2 === 0) c.fillRect(x, y, 63, 31);
     }
   }
   
-  // Court border
-  c.fillStyle = '#78350f';
+  // Out of bounds dark border
+  c.fillStyle = '#1e3a8a'; // Deep blue NBA border
   c.fillRect(0, 0, 2048, 60); c.fillRect(0, 1024-60, 2048, 60);
   c.fillRect(0, 0, 80, 1024); c.fillRect(2048-80, 0, 80, 1024);
   
@@ -228,13 +253,13 @@ function createCourtTexture(){
   
   // Center line & circle
   c.beginPath(); c.moveTo(1024, 60); c.lineTo(1024, 1024-60); c.stroke();
-  c.beginPath(); c.arc(1024, 512, 120, 0, Math.PI*2); c.stroke();
-  c.beginPath(); c.arc(1024, 512, 40, 0, Math.PI*2); c.fillStyle='#f59e0b'; c.fill(); c.stroke();
+  c.beginPath(); c.arc(1024, 512, 130, 0, Math.PI*2); c.stroke();
+  c.beginPath(); c.arc(1024, 512, 45, 0, Math.PI*2); c.fillStyle='#dc2626'; c.fill(); c.stroke();
   
-  // Left Key (Paint Area)
-  c.fillStyle = 'rgba(217, 119, 6, 0.75)';
-  c.fillRect(80, 512-110, 290, 220);
-  c.strokeRect(80, 512-110, 290, 220);
+  // Left Hoop Key (Painted Red like screenshot)
+  c.fillStyle = '#dc2626';
+  c.fillRect(80, 512-115, 290, 230);
+  c.strokeRect(80, 512-115, 290, 230);
   c.beginPath(); c.arc(80+290, 512, 90, -Math.PI/2, Math.PI/2); c.stroke();
   
   // Left 3-Point Arc
@@ -243,9 +268,10 @@ function createCourtTexture(){
   c.arc(80+70, 512, 380, -Math.PI*0.42, Math.PI*0.42);
   c.lineTo(80, 512+300); c.stroke();
 
-  // Right Key (Paint Area)
-  c.fillRect(2048-80-290, 512-110, 290, 220);
-  c.strokeRect(2048-80-290, 512-110, 290, 220);
+  // Right Hoop Key (Painted Blue like screenshot)
+  c.fillStyle = '#2563eb';
+  c.fillRect(2048-80-290, 512-115, 290, 230);
+  c.strokeRect(2048-80-290, 512-115, 290, 230);
   c.beginPath(); c.arc(2048-80-290, 512, 90, Math.PI/2, -Math.PI/2); c.stroke();
   
   // Right 3-Point Arc
@@ -255,9 +281,9 @@ function createCourtTexture(){
   c.lineTo(2048-80, 512+300); c.stroke();
   
   // Text Banners
-  c.font = '900 45px Outfit'; c.fillStyle = '#ffffff'; c.textAlign = 'center';
-  c.fillText('RIMSHOT PRO ARENA', 1024, 45);
-  c.fillText('STREET 5v5 CHAMPIONSHIP', 1024, 1024-15);
+  c.font = '900 48px Outfit'; c.fillStyle = '#ffffff'; c.textAlign = 'center';
+  c.fillText('NBA 2K PRO ARENA', 1024, 45);
+  c.fillText('OFFICIAL FIBA 5v5 RULES', 1024, 1024-15);
   
   const tex = new THREE.CanvasTexture(cv);
   tex.anisotropy = 16;
@@ -267,37 +293,36 @@ function createCourtTexture(){
 const courtGeo = new THREE.PlaneGeometry(CW + 30, CH + 20);
 const courtMat = new THREE.MeshStandardMaterial({
   map: createCourtTexture(),
-  roughness: 0.28,
-  metalness: 0.15
+  roughness: 0.25,
+  metalness: 0.18
 });
 const court = new THREE.Mesh(courtGeo, courtMat);
 court.rotation.x = -Math.PI/2;
 court.receiveShadow = true;
 scene.add(court);
 
-// Court Perimeter LED Advertising Boards
+// LED Advertising Boards (Just like screenshots: "Play Soccer", "Mini Games", "FB.com")
 function createLEDBoard(w, h, text, color){
   const cv=document.createElement('canvas'); cv.width=512; cv.height=64;
   const c=cv.getContext('2d');
   c.fillStyle=color; c.fillRect(0,0,512,64);
-  c.font='900 30px Outfit'; c.fillStyle='#fff'; c.textAlign='center';
+  c.font='900 28px Outfit'; c.fillStyle='#fff'; c.textAlign='center';
   c.fillText(text, 256, 42);
   const tex=new THREE.CanvasTexture(cv);
   return new THREE.Mesh(new THREE.BoxGeometry(w, h, 2), new THREE.MeshBasicMaterial({map:tex}));
 }
-const ledTop = createLEDBoard(CW+30, 8, '🔥 RIMSHOT PRO ARENA — 100% REALISTIC NBA 2K EXPERIENCE 🔥', '#b45309');
+const ledTop = createLEDBoard(CW+30, 8, '🔥 NBA 2K MOBILE — PLAY SOCCER — MINI GAMES — FB.COM/MY 🔥', '#b45309');
 ledTop.position.set(0, 4, -(CH/2 + 11)); scene.add(ledTop);
-const ledBot = createLEDBoard(CW+30, 8, '⚡ 5v5 STREET BASKETBALL — OFFICIAL FIBA RULES & SPACING ⚡', '#0f172a');
+const ledBot = createLEDBoard(CW+30, 8, '⚡ BASKETBALL STARS — OFFICIAL 5v5 SPACING — PRO CHAMPIONSHIP ⚡', '#1e3a8a');
 ledBot.position.set(0, 4, (CH/2 + 11)); scene.add(ledBot);
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 4. GRANDSTANDS & THOUSANDS OF ANIMATED SPECTATORS (Solving "qop qora bo'lib qolibdi")
+// 4. STADIUM STANDS, CROWD & CAMERA FLASH STROBES (Like Screenshot 5)
 // ═══════════════════════════════════════════════════════════════════════════
-const crowdInstances = [];
+const crowdInstances = [], strobeLights = [];
 function buildStadium(){
   const stGroup = new THREE.Group();
   
-  // Outer stadium concrete floor
   const floorMat = new THREE.MeshStandardMaterial({color:0x0f172a, roughness:0.8});
   const outerFloor = new THREE.Mesh(new THREE.PlaneGeometry(700, 500), floorMat);
   outerFloor.rotation.x = -Math.PI/2; outerFloor.position.y = -0.5;
@@ -307,7 +332,7 @@ function buildStadium(){
   const stepMat = new THREE.MeshStandardMaterial({color:0x334155, roughness:0.5});
   const crowdColors = [0xf59e0b, 0xffffff, 0x38bdf8, 0xef4444, 0x10b981, 0x8b5cf6, 0xfacc15];
   
-  // Left & Right Sideline Grandstand Tiers (Z axis)
+  // Sideline Grandstands
   [-1, 1].forEach(dir => {
     for(let row=0; row<12; row++){
       const zPos = dir * (CH/2 + 20 + row*12);
@@ -317,7 +342,6 @@ function buildStadium(){
       step.position.set(0, yPos - 3, zPos); step.receiveShadow = true;
       stGroup.add(step);
       
-      // Populate row with lively spectators
       for(let x = -CW/2 - 30; x <= CW/2 + 30; x += 11){
         if(Math.random() < 0.88){
           const col = crowdColors[Math.floor(Math.random()*crowdColors.length)];
@@ -326,34 +350,22 @@ function buildStadium(){
           spec.rotation.y = dir === 1 ? Math.PI : 0;
           stGroup.add(spec);
           crowdInstances.push({mesh: spec, baseY: yPos + 3.2, phase: Math.random()*Math.PI*2, speed: 0.12 + Math.random()*0.15});
+          
+          // Add Camera Flash Strobes (like screenshot 5)
+          if(Math.random() < 0.15){
+            const strMat = new THREE.SpriteMaterial({color:0xffffff, transparent:true, opacity:0});
+            const sprite = new THREE.Sprite(strMat);
+            sprite.scale.set(4, 4, 1);
+            sprite.position.set(spec.position.x, spec.position.y + 4, spec.position.z);
+            stGroup.add(sprite);
+            strobeLights.push({sprite: sprite, timer: Math.random()*200});
+          }
         }
       }
     }
   });
   
-  // Baseline Stands (X axis)
-  [-1, 1].forEach(dir => {
-    for(let row=0; row<8; row++){
-      const xPos = dir * (CW/2 + 30 + row*12);
-      const yPos = row * 6 + 3;
-      const step = new THREE.Mesh(new THREE.BoxGeometry(12, 6, CH + 20), standMat);
-      step.position.set(xPos, yPos - 3, 0);
-      stGroup.add(step);
-      
-      for(let z = -CH/2; z <= CH/2; z += 12){
-        if(Math.random() < 0.82){
-          const col = crowdColors[Math.floor(Math.random()*crowdColors.length)];
-          const spec = createSpectator(col);
-          spec.position.set(xPos, yPos + 3.2, z + (Math.random()*4-2));
-          spec.rotation.y = dir === 1 ? -Math.PI/2 : Math.PI/2;
-          stGroup.add(spec);
-          crowdInstances.push({mesh: spec, baseY: yPos + 3.2, phase: Math.random()*Math.PI*2, speed: 0.12 + Math.random()*0.15});
-        }
-      }
-    }
-  });
-  
-  // Center-Hung LED Scoreboard (Jumbotron)
+  // Center Jumbotron Scoreboard
   const jumbo = new THREE.Group(); jumbo.position.set(0, 85, 0);
   const jBox = new THREE.Mesh(new THREE.BoxGeometry(44, 22, 44), new THREE.MeshStandardMaterial({color:0x090d16, metalness:0.8}));
   jumbo.add(jBox);
@@ -363,9 +375,9 @@ function buildStadium(){
     const c=cv.getContext('2d');
     c.fillStyle='#020617'; c.fillRect(0,0,512,256);
     c.fillStyle='#38bdf8'; c.font='900 44px Outfit'; c.textAlign='center';
-    c.fillText('RIMSHOT PRO ARENA', 256, 65);
+    c.fillText('NBA 2K ARENA', 256, 65);
     c.fillStyle='#fbbf24'; c.font='bold 40px Share Tech Mono';
-    c.fillText('SARIQ  00 — 00  OQ', 256, 145);
+    c.fillText('USA  00 — 00  PHI', 256, 145);
     c.fillStyle='#10b981'; c.font='900 34px Outfit';
     c.fillText('PERIOD 1  |  03:00', 256, 215);
     return new THREE.Mesh(new THREE.PlaneGeometry(40, 20), new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cv)}));
@@ -377,7 +389,7 @@ function buildStadium(){
   const j4=makeJFace(); j4.position.set(-22.2,0,0); j4.rotation.y=-Math.PI/2; jumbo.add(j4);
   stGroup.add(jumbo);
   
-  // Arena Perimeter Walls & Columns
+  // Arena Perimeter Walls
   const wallMat = new THREE.MeshStandardMaterial({color:0x030712, roughness:0.9});
   const wallL = new THREE.Mesh(new THREE.BoxGeometry(700, 140, 10), wallMat); wallL.position.set(0, 70, -210); stGroup.add(wallL);
   const wallR = new THREE.Mesh(new THREE.BoxGeometry(700, 140, 10), wallMat); wallR.position.set(0, 70, 210); stGroup.add(wallR);
@@ -440,7 +452,7 @@ function createHoop(isRight){
 createHoop(false); createHoop(true);
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 6. LIFELIKE 3D ANATOMICAL PLAYERS (Solving "hayotiy qil")
+// 6. LIFELIKE PLAYERS WITH GLOWING NEON AURAS (Like Screenshots!)
 // ═══════════════════════════════════════════════════════════════════════════
 const SKINS = [0xf5b041, 0xd4a76a, 0xc8956c, 0xa57b59, 0xf0d0a8, 0x8d5524];
 const SHOES = [0xffffff, 0xdc2626, 0x2563eb, 0x10b981, 0xf59e0b];
@@ -466,7 +478,7 @@ class Player3D {
     this.speed = 0; this.jumping = false; this.jumpVy = 0;
     this.boost = 0; this.celeb = 0; this.hasBall = false;
     
-    // Tactical 5v5 Positions (PG, SG, SF, PF, Center)
+    // Tactical 5v5 Positions
     const roleIdx = id % 5;
     const dir = team === 0 ? -1 : 1;
     const homeX = [dir*30, dir*60, dir*60, dir*90, dir*100][roleIdx];
@@ -477,18 +489,26 @@ class Player3D {
     this.group.position.copy(this.pos);
     scene.add(this.group);
     
-    // Shadow
+    // 1. Shadow
     const shMat = new THREE.MeshBasicMaterial({color:0x000000, transparent:true, opacity:0.45});
     const shadow = new THREE.Mesh(new THREE.CircleGeometry(3.0, 16), shMat);
     shadow.rotation.x = -Math.PI/2; shadow.position.y = 0.05;
     this.group.add(shadow);
+    
+    // 2. Glowing Neon Aura Ring (Exactly like screenshots!)
+    const auraCol = isUser ? 0x38bdf8 : (team===0 ? 0xf59e0b : 0xef4444);
+    const auraMat = new THREE.MeshBasicMaterial({color: auraCol, transparent:true, opacity: isUser ? 0.8 : 0.2, side: THREE.DoubleSide});
+    this.auraRing = new THREE.Mesh(new THREE.RingGeometry(3.2, 4.2, 24), auraMat);
+    this.auraRing.rotation.x = -Math.PI/2;
+    this.auraRing.position.y = 0.08;
+    this.group.add(this.auraRing);
     
     this.body = new THREE.Group();
     this.group.add(this.body);
     
     const skinColor = SKINS[id % SKINS.length];
     const shoeColor = SHOES[id % SHOES.length];
-    const jerseyHex = team === 0 ? '#f59e0b' : '#1e293b';
+    const jerseyHex = team === 0 ? '#f59e0b' : '#1e3a8a';
     const numStr = team === 0 ? YNUM[roleIdx] : WNUM[roleIdx];
     
     const jTex = makeJerseyTexture(jerseyHex, numStr);
@@ -497,22 +517,19 @@ class Player3D {
       new THREE.MeshStandardMaterial({color: jerseyHex}),
       new THREE.MeshStandardMaterial({color: jerseyHex}),
       new THREE.MeshStandardMaterial({color: jerseyHex}),
-      new THREE.MeshStandardMaterial({map: jTex}), // Front
-      new THREE.MeshStandardMaterial({map: jTex})  // Back
+      new THREE.MeshStandardMaterial({map: jTex}),
+      new THREE.MeshStandardMaterial({map: jTex})
     ];
     
-    // Athletic Sculpted Torso
     this.torso = new THREE.Mesh(new THREE.BoxGeometry(3.4, 5.2, 1.9), torsoMat);
     this.torso.position.y = 7.6; this.torso.castShadow = true;
     this.body.add(this.torso);
     
-    // Sculpted Head & Headband
     const headMat = new THREE.MeshStandardMaterial({color: skinColor, roughness:0.5});
     this.head = new THREE.Mesh(new THREE.SphereGeometry(1.5, 16, 16), headMat);
     this.head.position.y = 11.5; this.head.castShadow = true;
     this.body.add(this.head);
     
-    // Headband / Sweatband
     const bandMat = new THREE.MeshStandardMaterial({color: team===0 ? 0xdc2626 : 0xffffff});
     const band = new THREE.Mesh(new THREE.CylinderGeometry(1.52, 1.52, 0.5, 16), bandMat);
     band.position.y = 11.8; this.body.add(band);
@@ -520,7 +537,7 @@ class Player3D {
     if(isUser){
       const arrMat = new THREE.MeshBasicMaterial({color: 0xfbbf24});
       const arr = new THREE.Mesh(new THREE.ConeGeometry(0.9, 2.2, 8), arrMat);
-      arr.rotation.x = Math.PI; arr.position.y = 14.2;
+      arr.rotation.x = Math.PI; arr.position.y = 14.5;
       this.body.add(arr);
     }
     
@@ -528,7 +545,6 @@ class Player3D {
     const shoeMat = new THREE.MeshStandardMaterial({color: shoeColor});
     const sockMat = new THREE.MeshStandardMaterial({color: 0xffffff});
     
-    // Athletic Arms with Wristbands
     this.armL = new THREE.Group(); this.armL.position.set(-2.2, 9.8, 0);
     const alMesh = new THREE.Mesh(new THREE.BoxGeometry(1.0, 4.6, 1.0), limbMat); alMesh.position.y = -2.3; alMesh.castShadow=true;
     const alBand = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.6, 1.05), bandMat); alBand.position.y = -4.0;
@@ -539,7 +555,6 @@ class Player3D {
     const arBand = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.6, 1.05), bandMat); arBand.position.y = -4.0;
     this.armR.add(arMesh); this.armR.add(arBand); this.body.add(this.armR);
     
-    // Legs with Compression Socks & Pro Sneakers
     this.legL = new THREE.Group(); this.legL.position.set(-1.0, 5.0, 0);
     const lMesh = new THREE.Mesh(new THREE.BoxGeometry(1.2, 3.2, 1.2), limbMat); lMesh.position.y = -1.6; lMesh.castShadow=true;
     const lSock = new THREE.Mesh(new THREE.BoxGeometry(1.22, 1.6, 1.22), sockMat); lSock.position.y = -3.8;
@@ -556,6 +571,14 @@ class Player3D {
   update(dt, sysT){
     if(this.boost > 0) this.boost--;
     if(this.celeb > 0) this.celeb--;
+    
+    // Pulse Aura Ring when holding ball!
+    if(this.hasBall || this.isUser){
+      this.auraRing.material.opacity = 0.5 + Math.abs(Math.sin(sysT * 0.15)) * 0.4;
+      this.auraRing.rotation.z += 0.04;
+    } else {
+      this.auraRing.material.opacity = 0.15;
+    }
     
     if(this.jumping){
       this.pos.y += this.jumpVy;
@@ -577,7 +600,6 @@ class Player3D {
     this.yaw += diff * 0.2;
     this.body.rotation.y = this.yaw;
     
-    // Natural Athletic Gait & Dribble Stance
     const spd = this.vel.length();
     if(spd > 0.1 && !this.jumping){
       const freq = sysT * 0.28;
@@ -587,7 +609,6 @@ class Player3D {
         this.armL.rotation.x = -Math.sin(freq) * 0.65;
         this.armR.rotation.x = Math.sin(freq) * 0.65;
       } else {
-        // Dribbling forward lean stance
         this.torso.rotation.x = 0.2;
         this.armR.rotation.x = -0.5 + Math.sin(sysT*0.3)*0.4;
       }
@@ -703,7 +724,28 @@ function doShoot(p){
   ball.vel.y = (targetHoop.y - ball.pos.y + 0.5 * 0.5 * time * time) / time;
   
   snd.swish();
-  if(!p.jumping){ p.jumpVy = 1.6; p.jumping = true; }
+  if(!p.jumping){ p.jumpVy = 1.8; p.jumping = true; }
+  if(p === user) popText('🏀 JUMP SHOT!', '#fbbf24');
+}
+
+function doDunk(p){
+  if(!ball.carried || ball.carrier !== p) return;
+  const targetHoop = p.team === 0 ? HOOP_R : HOOP_L;
+  if(p.pos.distanceTo(targetHoop) > 40){
+    doShoot(p); return;
+  }
+  ball.carried = false; ball.carrier = null; p.hasBall = false;
+  ball.scored = false; ball.imm = 40;
+  
+  // Explosive Dunk trajectory
+  const time = 10;
+  ball.vel.x = (targetHoop.x - ball.pos.x) / time;
+  ball.vel.z = (targetHoop.z - ball.pos.z) / time;
+  ball.vel.y = 2.4;
+  
+  snd.rim(); snd.swish();
+  if(!p.jumping){ p.jumpVy = 2.4; p.jumping = true; }
+  if(p === user) popText('🔥 SLAM DUNK!', '#ef4444');
 }
 
 function doPass(p){
@@ -750,7 +792,7 @@ function scoreGoal(team){
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 8. 360° CAMERA & CORRECTED FORWARD MOVEMENT (Solving Up/W direction)
+// 8. 360° ORBITAL CHASE CAMERA & CONTROLS
 // ═══════════════════════════════════════════════════════════════════════════
 let camYaw = Math.PI/2, camPitch = 0.35;
 let isPointerLocked = false;
@@ -793,7 +835,6 @@ function handleInput(){
   if(gSt !== 'play' || !user) return;
   if(keys['escape']){ togglePause(); return; }
   
-  // W/ArrowUp moves forward AWAY from camera! S moves backward! A/D strafe left/right!
   let fwd = 0, str = 0;
   if(keys['w'] || keys['arrowup']) fwd += 1;
   if(keys['s'] || keys['arrowdown']) fwd -= 1;
@@ -803,7 +844,6 @@ function handleInput(){
   const spd = user.boost > 0 ? 1.6 : (diff==='easy' ? 1.1 : 1.3);
   
   if(fwd !== 0 || str !== 0){
-    // Calculate exact angle: when fwd=1, offset=0, worldAngle=camYaw (directly away from camera into screen!)
     const offset = Math.atan2(str, fwd);
     const worldAngle = camYaw + offset;
     
@@ -816,7 +856,8 @@ function handleInput(){
   
   // Actions
   if((keys[' '] || keys['jump']) && !user.jumping && user.pos.y <= 0){
-    user.jumpVy = 1.6; user.jumping = true; snd.bounce();
+    if(ball.carrier === user) doDunk(user);
+    else { user.jumpVy = 1.8; user.jumping = true; snd.bounce(); }
   }
   if(keys['k'] || keys['shoot']){
     keys['k']=false; keys['shoot']=false;
@@ -863,6 +904,7 @@ function updateAI(){
     
     if(ball.carrier === p){
       const dist = p.pos.distanceTo(targetHoop);
+      if(dist < 35 && Math.random() < 0.05){ doDunk(p); return; }
       if(dist < 55 && Math.random() < 0.03){ doShoot(p); return; }
       
       let minEnemyDist = 999;
@@ -902,7 +944,7 @@ function updateAI(){
             popText('🤙 STEAL!', '#10b981');
           }
           if(opp.jumping && !p.jumping && Math.random() < 0.3){
-            p.jumpVy = 1.6; p.jumping = true;
+            p.jumpVy = 1.8; p.jumping = true;
           }
         }
       }
@@ -935,26 +977,26 @@ function moveToZone(p, target, spd){
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 10. MINIMAP & GAME LOOP
+// 10. MINIMAP, STROBES & GAME LOOP
 // ═══════════════════════════════════════════════════════════════════════════
 const minimap = document.getElementById('minimap');
 const mCtx = minimap.getContext('2d');
 function drawMinimap(){
-  minimap.width = 200; minimap.height = 112;
-  mCtx.fillStyle = '#0f172a'; mCtx.fillRect(0, 0, 200, 112);
+  minimap.width = 180; minimap.height = 100;
+  mCtx.fillStyle = '#0f172a'; mCtx.fillRect(0, 0, 180, 100);
   mCtx.strokeStyle = '#94a3b8'; mCtx.lineWidth = 1.5;
-  mCtx.strokeRect(6, 6, 188, 100);
-  mCtx.beginPath(); mCtx.moveTo(100, 6); mCtx.lineTo(100, 106); mCtx.stroke();
+  mCtx.strokeRect(6, 6, 168, 88);
+  mCtx.beginPath(); mCtx.moveTo(90, 6); mCtx.lineTo(90, 94); mCtx.stroke();
   
   players.forEach(p => {
-    const mx = 100 + (p.pos.x / (CW/2)) * 88;
-    const my = 56 + (p.pos.z / (CH/2)) * 44;
+    const mx = 90 + (p.pos.x / (CW/2)) * 80;
+    const my = 50 + (p.pos.z / (CH/2)) * 40;
     mCtx.fillStyle = p.isUser ? '#38bdf8' : (p.team===0 ? '#f59e0b' : '#ffffff');
     mCtx.beginPath(); mCtx.arc(mx, my, p.isUser ? 5.5 : 3.8, 0, Math.PI*2); mCtx.fill();
   });
   
-  const bx = 100 + (ball.pos.x / (CW/2)) * 88;
-  const by = 56 + (ball.pos.z / (CH/2)) * 44;
+  const bx = 90 + (ball.pos.x / (CW/2)) * 80;
+  const by = 50 + (ball.pos.z / (CH/2)) * 40;
   mCtx.fillStyle = '#ea580c';
   mCtx.beginPath(); mCtx.arc(bx, by, 3.2, 0, Math.PI*2); mCtx.fill();
 }
@@ -988,15 +1030,26 @@ function loop(){
     updateCamera();
     drawMinimap();
     
-    // Animate Crowd Spectators jumping and cheering!
+    // Animate Crowd jumping
     crowdInstances.forEach(c => {
       c.mesh.position.y = c.baseY + Math.abs(Math.sin(sysT * c.speed + c.phase)) * 0.9;
+    });
+    
+    // Animate Camera Strobes (Like Screenshot 5)
+    strobeLights.forEach(s => {
+      s.timer--;
+      if(s.timer <= 0){
+        s.sprite.material.opacity = 1.0;
+        s.timer = 150 + Math.random()*200;
+      } else if(s.sprite.material.opacity > 0){
+        s.sprite.material.opacity -= 0.08;
+      }
     });
     
     const m = Math.floor(mTim/60), s = Math.floor(mTim%60);
     const te = document.getElementById('hud-timer');
     te.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    te.className = 'hs-c' + (mTim<=10 && mTim>0 ? ' urg' : '');
+    te.className = 'sc-timer' + (mTim<=10 && mTim>0 ? ' urg' : '');
   }
   
   renderer.render(scene, camera);
@@ -1004,10 +1057,15 @@ function loop(){
 loop();
 
 function startGame(){
-  const nm = document.getElementById('inp-name').value || 'Baller_Pro';
-  const fl = document.getElementById('inp-country').value || '🇺🇿';
+  const nm = document.getElementById('inp-name').value || 'Michael_23';
+  const hm = document.getElementById('inp-home').value.split('|');
+  const aw = document.getElementById('inp-away').value.split('|');
   diff = document.getElementById('inp-diff').value || 'medium';
-  document.getElementById('hud-flag').textContent = fl + ' ' + nm;
+  
+  document.getElementById('flag-h').textContent = hm[0];
+  document.getElementById('name-h').textContent = hm[1];
+  document.getElementById('flag-a').textContent = aw[0];
+  document.getElementById('name-a').textContent = aw[1];
   
   uSc = 0; bSc = 0; mTim = 180; sysT = 0;
   document.getElementById('sc-y').textContent = '00';
@@ -1040,19 +1098,21 @@ function endMatch(){
   const w = uSc >= bSc;
   document.getElementById('go-t').textContent = w ? '🏆 G\'ALABA!' : '😢 YUTQIZDIK!';
   document.getElementById('go-w').textContent = w ? 'Sizning jamoangiz g\'alaba qozondi!' : 'Raqib jamoa g\'alaba qildi.';
-  document.getElementById('go-s').textContent = `Sariq: ${uSc*2} — Oq: ${bSc*2}`;
+  document.getElementById('go-s').textContent = `Home: ${uSc*2} — Away: ${bSc*2}`;
   if(w) snd.celebrate();
   document.getElementById('ov-go').classList.remove('hid');
 }
 
-function bindT(id, keyStr){
+// Bind Action Buttons
+function bindBtn(id, actionFn){
   const el = document.getElementById(id); if(!el) return;
-  el.addEventListener('touchstart', e=>{ e.preventDefault(); keys[keyStr]=true; },{passive:false});
-  el.addEventListener('touchend', e=>{ e.preventDefault(); keys[keyStr]=false; },{passive:false});
-  el.addEventListener('mousedown', ()=>keys[keyStr]=true);
-  el.addEventListener('mouseup', ()=>keys[keyStr]=false);
+  el.addEventListener('mousedown', actionFn);
+  el.addEventListener('touchstart', e=>{ e.preventDefault(); actionFn(); });
 }
-bindT('tj','jump'); bindT('ts','shoot'); bindT('tp','pass'); bindT('te','boost');
+bindBtn('btn-shoot', ()=>keys['shoot']=true);
+bindBtn('btn-dunk', ()=>keys['jump']=true);
+bindBtn('btn-pass', ()=>keys['pass']=true);
+bindBtn('btn-boost', ()=>keys['boost']=true);
 </script>
 </body>
 </html>
