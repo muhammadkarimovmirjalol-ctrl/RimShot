@@ -76,10 +76,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050a14;font-family:
 <!-- CAMERA INFO -->
 <div id="cam-hud">
   <div><span class="kb">1</span> Yon · <span class="kb">2</span> Orqa · <span class="kb">3</span> Yuqori · <span class="kb">4</span> Kino</div>
-  <div><span class="kb">C</span> Kamera almashtir</div>
-  <div><span class="kb">Mouse Drag</span> Erkin kamera aylantir</div>
-  <div><span class="kb">WASD/Arrows</span> Harakat · <span class="kb">Space</span> Sakra</div>
-  <div><span class="kb">K</span> Shoot/Steal · <span class="kb">E</span> Boost</div>
+  <div><span class="kb">C</span> Kamera almashtir · <span class="kb">Mouse Drag</span> Erkin aylantir</div>
+  <div><span class="kb">WASD/Arrows</span> Harakat · <span class="kb">Space</span> Sakrash</div>
+  <div><span class="kb">K</span> Shoot/Steal · <span class="kb">F</span> Pass · <span class="kb">E</span> Boost</div>
   <div id="cam-mode">📷 Yon Ko'rinish</div>
 </div>
 
@@ -443,34 +442,91 @@ class Player {
     const hasBall=B.carrier===this;
     const myHoop =this.team===TY ? HR : HL;
     const oppHoop=this.team===TY ? HL : HR;
+    const teammates=players.filter(p=>p.team===this.team&&p!==this);
+    const opponents=players.filter(p=>p.team!==this.team);
+    const dir=this.team===TY?1:-1;
 
     if(hasBall){
-      const dist=Math.hypot(this.x-myHoop.x,this.y-myHoop.y);
-      const shootDist=difficulty==='hard'?330:difficulty==='easy'?190:265;
-      const shootP   =difficulty==='hard'?0.022:difficulty==='easy'?0.009:0.014;
-      if(dist<shootDist&&Math.random()<shootP){ doShoot(this); return; }
-      this._to(myHoop.x+(this.team===TY?-160:160), myHoop.y, sp);
+      // ── OFFENSE WITH BALL ──
+      const distToHoop=Math.hypot(this.x-myHoop.x,this.y-myHoop.y);
+      const shootDist=difficulty==='hard'?380:difficulty==='easy'?210:290;
+      const shootP=difficulty==='hard'?0.028:difficulty==='easy'?0.01:0.016;
+
+      // Check if blocked by nearest defender
+      let nearDef=null, nearDefDist=9999;
+      opponents.forEach(o=>{ const d=Math.hypot(o.x-this.x,o.y-this.y); if(d<nearDefDist){nearDefDist=d;nearDef=o;} });
+      const blocked=nearDefDist<60;
+
+      // Pass if blocked & open teammate exists
+      if(blocked&&Math.random()<0.04){
+        const openTm=teammates.filter(t=>{
+          const closestOpp=opponents.reduce((mn,o)=>Math.min(mn,Math.hypot(o.x-t.x,o.y-t.y)),9999);
+          return closestOpp>75&&Math.hypot(t.x-myHoop.x,t.y-myHoop.y)<distToHoop+100;
+        });
+        if(openTm.length>0){ doPass(this); return; }
+      }
+
+      // Shoot if in range & somewhat open
+      if(distToHoop<shootDist&&Math.random()<shootP&&(nearDefDist>40||Math.random()<0.3)){
+        doShoot(this); return;
+      }
+
+      // Drive toward hoop, dodge defender
+      let tx=myHoop.x+dir*(-150), ty=myHoop.y;
+      if(blocked&&nearDef){
+        ty+=(this.y>nearDef.y?1:-1)*50;
+        ty=Math.max(18,Math.min(CW-18,ty));
+      }
+      this._to(tx,ty,sp);
+
+      // Smart pass after dribbling a while (every ~120 frames)
+      if(sysTime%120<2&&Math.random()<0.06) doPass(this);
+
     } else if(!B.isCarried){
-      this._to(B.x, B.y, sp*0.88);
+      // ── LOOSE BALL ──
+      this._to(B.x,B.y,sp*0.92);
+
     } else if(B.carrier&&B.carrier.team===this.team){
-      // Spread out in open positions
+      // ── TEAMMATE HAS BALL — OFFENSE WITHOUT BALL ──
       const slot=this.id%5;
-      const ox=this.team===TY ? 600+slot*230 : CL-600-slot*230;
-      const oy=30+slot*(CW/4.5);
-      this._to(ox,oy,sp*0.7);
-      // Teammate with ball: occasionally jump
-      if(Math.random()<0.002&&!this.isJumping){this.vz=9;this.isJumping=true;}
+      const progress=this.team===TY
+        ? Math.max(B.carrier.x,CL*0.3)
+        : Math.min(B.carrier.x,CL*0.7);
+      // 5 spread positions
+      const offsets=[
+        {dx:150,dy:-55},{dx:150,dy:55},
+        {dx:-70,dy:0},{dx:230,dy:-25},{dx:230,dy:25}
+      ];
+      const off=offsets[slot];
+      const ox=Math.max(50,Math.min(CL-50,progress+off.dx*dir));
+      const oy=Math.max(18,Math.min(CW-18,CW/2+off.dy));
+      this._to(ox,oy,sp*0.72);
+      // Jump to call for pass
+      if(Math.random()<0.003&&!this.isJumping){this.vz=8;this.isJumping=true;}
+
     } else {
-      // ZONE DEFENSE: get between ball carrier and own hoop
+      // ── DEFENSE — ZONE + MAN ──
       if(B.carrier){
-        const gx=B.carrier.x+(oppHoop.x-B.carrier.x)*0.4;
-        const gy=B.carrier.y+(oppHoop.y-B.carrier.y)*0.4;
-        this._to(gx,gy,sp*0.92);
-        // Steal attempt
+        const mySlot=this.id%5;
+        // Zone: position between carrier and our hoop
+        const zFactor=0.25+mySlot*0.13;
+        const zoneX=oppHoop.x+(B.carrier.x-oppHoop.x)*zFactor;
+        const zoneY=B.carrier.y+(mySlot%3-1)*42;
+        this._to(zoneX,Math.max(15,Math.min(CW-15,zoneY)),sp*0.9);
+
+        // Aggressive steal
         const d=Math.hypot(this.x-B.carrier.x,this.y-B.carrier.y);
-        if(d<58&&B.carrier.z<25&&Math.random()<0.009){
+        const stealP=difficulty==='hard'?0.016:difficulty==='easy'?0.005:0.01;
+        if(d<55&&B.carrier.z<22&&Math.random()<stealP){
           B.carrier=this;B.isCarried=true;
-          snd.steal(); pop(this.x,this.y,'🤙 STEAL!','#10b981');
+          snd.steal();pop(this.x,this.y,'🤙 STEAL!','#10b981');
+        }
+
+        // Shot block — jump when carrier near our hoop
+        const cToH=Math.hypot(B.carrier.x-oppHoop.x,B.carrier.y-oppHoop.y);
+        if(d<65&&cToH<260&&!this.isJumping&&Math.random()<0.01){
+          this.vz=12;this.isJumping=true;
+          pop(this.x,this.y,'🖐️ BLOCK!','#ef4444');
         }
       }
     }
@@ -1001,7 +1057,7 @@ window.addEventListener('keydown',e=>{
 window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
 
 function onKey(k){
-  if(gState!=='playing') return;
+  if(gState!=='playing'||!userPlayer) return;
   if(k==='escape'){togglePause();return;}
   if(k==='1') setCamMode(1);
   if(k==='2') setCamMode(2);
@@ -1009,25 +1065,31 @@ function onKey(k){
   if(k==='4') setCamMode(4);
   if(k==='c'){setCamMode(C.mode%4+1);}
 
-  if(k==='k'){ // Shoot / Steal
+  // K = SHOOT / STEAL / PICKUP
+  if(k==='k'){
     if(B.carrier===userPlayer) doShoot(userPlayer);
-    else if(!B.isCarried&&B.immunity===0&&Math.hypot(userPlayer.x-B.x,userPlayer.y-B.y)<55&&B.z<45){
-      B.isCarried=true;B.carrier=userPlayer;
+    else if(!B.isCarried&&B.immunity===0&&Math.hypot(userPlayer.x-B.x,userPlayer.y-B.y)<58&&B.z<48){
+      B.isCarried=true;B.carrier=userPlayer;B.vx=0;B.vy=0;B.vz=0;
+      pop(userPlayer.x,userPlayer.y,'🏀 OLDIM!','#fbbf24');
     } else if(B.carrier&&B.carrier.team!==TY){
       const d=Math.hypot(userPlayer.x-B.carrier.x,userPlayer.y-B.carrier.y);
-      if(d<68){B.carrier=userPlayer;B.isCarried=true;snd.steal();pop(userPlayer.x,userPlayer.y,'🔥 STEAL!','#10b981');}
+      if(d<70){B.carrier=userPlayer;B.isCarried=true;snd.steal();pop(userPlayer.x,userPlayer.y,'🔥 STEAL!','#10b981');}
     }
   }
 
-  if(k===' '||k==='space'){
-    // JUMP
+  // SPACE = JUMP ONLY
+  if(k===' '){
     if(!userPlayer.isJumping&&userPlayer.z<=0){
       userPlayer.vz=13;userPlayer.isJumping=true;snd.bounce();
     }
-    // PASS if have ball
+  }
+
+  // F = PASS
+  if(k==='f'){
     if(B.carrier===userPlayer) doPass(userPlayer);
   }
 
+  // E = BOOST
   if(k==='e'){ userPlayer.boostTimer=145; snd.steal(); pop(userPlayer.x,userPlayer.y,'⚡ BOOST!','#38bdf8'); }
 }
 
@@ -1044,7 +1106,7 @@ bindBtn('tl','arrowleft');bindBtn('tr','arrowright');
 bindBtn('tu','arrowup');bindBtn('td','arrowdown');
 bindBtn('ts','k');
 bindBtn('tj',' ');
-bindBtn('tp','passbtn',()=>doPass(userPlayer));
+bindBtn('tp','f');
 bindBtn('te','e');
 
 // ═══════════════════════════════════════════════
@@ -1100,6 +1162,23 @@ function update(){
   if(gState!=='playing') return;
 
   players.forEach(p=>p.update());
+
+  // PLAYER COLLISION — push apart so they don't overlap
+  for(let i=0;i<players.length;i++){
+    for(let j=i+1;j<players.length;j++){
+      const a=players[i],b=players[j];
+      const dx=b.x-a.x,dy=b.y-a.y;
+      const dist=Math.hypot(dx,dy);
+      const minD=22; // minimum distance between players
+      if(dist<minD&&dist>0.5){
+        const push=(minD-dist)*0.5;
+        const nx=dx/dist,ny=dy/dist;
+        a.x-=nx*push; a.y-=ny*push;
+        b.x+=nx*push; b.y+=ny*push;
+      }
+    }
+  }
+
   updateBall();
   updateParticles();
   textPopups.forEach(t=>{t.rz+=0.55;t.life--;});
